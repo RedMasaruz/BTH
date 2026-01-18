@@ -84,8 +84,8 @@ self.addEventListener('fetch', (event) => {
               return response;
             }
             
-            // If not in cache and offline, return a basic offline page
-            if (event.request.destination === 'document') {
+            // If not in cache and offline, return a basic offline page for navigation requests
+            if (event.request.mode === 'navigate') {
               return new Response(
                 `<!DOCTYPE html>
                 <html lang="th">

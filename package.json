@@ -17,7 +17,6 @@
     "herb"
   ],
   "author": "บริษัท บ้านไทยเฮิร์บเซ็นเตอร์ จำกัด",
-  "license": "UNLICENSED",
   "private": true,
   "dependencies": {
     "sharp": "^0.34.5"

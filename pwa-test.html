@@ -165,7 +165,8 @@
         }
 
         // Test 3: Manifest Check
-        fetch('/manifest.json')
+        const manifestUrl = new URL('manifest.json', window.location.origin).href;
+        fetch(manifestUrl)
             .then(response => {
                 if (response.ok) {
                     document.getElementById('manifest-check').className = 'status pass';
