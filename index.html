@@ -6,7 +6,7 @@
     <!-- Updated viewport to include safe-area for iOS devices -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>ระบบบันทึกและติดตามเกษตรกร</title>
-    
+
     <!-- PWA Meta Tags -->
     <meta name="description" content="ระบบบันทึกและติดตามข้อมูลเกษตรกร - บริษัท บ้านไทยเฮิร์บเซ็นเตอร์ จำกัด">
     <meta name="theme-color" content="#16a34a">
@@ -14,17 +14,17 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="BTH Farmer">
-    
+
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json">
-    
+
     <!-- App Icons -->
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512x512.png">
     <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
     <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192x192.png">
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -3274,6 +3274,66 @@
         // =============================================
         // CONSTANTS & CONFIGURATION
         // =============================================
+        const isGitHubPages = window.location.hostname.includes('github.io');
+        const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwlLPesLd6v2S93WX4myU6MM81Nc-ZqYO6NqOMLd1wga7RlOzvFNCmnWFCLReQHdgNh/exec';
+
+        if (isGitHubPages && typeof google === 'undefined') {
+            // Create mock google.script.run for GitHub Pages
+            window.google = {
+                script: {
+                    run: {
+                        withSuccessHandler: function (successCallback) {
+                            this._success = successCallback;
+                            return this;
+                        },
+                        withFailureHandler: function (failureCallback) {
+                            this._failure = failureCallback;
+                            return this;
+                        },
+                        withUserObject: function (userObject) {
+                            this._userObject = userObject;
+                            return this;
+                        }
+                    }
+                }
+            };
+
+            // Add proxy functions for each backend function
+            const backendFunctions = [
+                'userLogin', 'writeSheetA', 'writeSheetB', 'submitForm',
+                'searchFarmerData', 'getAllFarmersByLong', 'searchSheetBData',
+                'createNewSheetForLong', 'getAllFarmers', 'getAllUsage', 'getAllMerged'
+            ];
+
+            backendFunctions.forEach(funcName => {
+                google.script.run[funcName] = function (...args) {
+                    const self = google.script.run;
+
+                    // Call backend via fetch
+                    fetch(BACKEND_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams({
+                            function: funcName,
+                            args: JSON.stringify(args)
+                        })
+                    })
+                        .then(response => response.json())
+                        .then(result => {
+                            if (self._success) {
+                                self._success.call(null, result, self._userObject);
+                            }
+                        })
+                        .catch(error => {
+                            if (self._failure) {
+                                self._failure.call(null, error, self._userObject);
+                            }
+                        });
+                };
+            });
+        }
         const LONG_OPTIONS = [
             { value: "", text: "--- เลือกตัวแทนที่สังกัด ---" },
             { value: "ตัวแทนพี่บาสBDS", text: "ตัวแทนพี่บาสBDS" },
@@ -7203,12 +7263,12 @@
                 navigator.serviceWorker.register('/sw.js')
                     .then(registration => {
                         console.log('✅ Service Worker registered successfully:', registration.scope);
-                        
+
                         // Check for updates periodically
                         setInterval(() => {
                             registration.update();
                         }, 60000); // Check every minute
-                        
+
                         // Handle service worker updates
                         registration.addEventListener('updatefound', () => {
                             const newWorker = registration.installing;
@@ -7216,7 +7276,7 @@
                                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                                     // New service worker available
                                     console.log('🔄 New version available! Please refresh.');
-                                    
+
                                     // Optionally show a notification to the user
                                     if (window.confirm('มีเวอร์ชันใหม่ของระบบ คุณต้องการรีเฟรชหน้าเพื่ออัพเดทหรือไม่?')) {
                                         newWorker.postMessage({ type: 'SKIP_WAITING' });
@@ -7229,7 +7289,7 @@
                     .catch(error => {
                         console.error('❌ Service Worker registration failed:', error);
                     });
-                
+
                 // Handle service worker controller change (when new SW takes over)
                 navigator.serviceWorker.addEventListener('controllerchange', () => {
                     console.log('🔄 Service Worker controller changed, reloading page...');
@@ -7244,41 +7304,41 @@
         // PWA INSTALL PROMPT
         // =============================================
         let deferredPrompt;
-        
+
         window.addEventListener('beforeinstallprompt', (e) => {
             // Prevent the mini-infobar from appearing on mobile
             e.preventDefault();
             // Stash the event so it can be triggered later
             deferredPrompt = e;
-            
+
             console.log('💾 PWA install prompt available');
-            
+
             // Optionally show a custom install button
             // You can create a button in the UI and call showInstallPrompt() when clicked
         });
-        
-        window.showInstallPrompt = async function() {
+
+        window.showInstallPrompt = async function () {
             if (!deferredPrompt) {
                 console.log('ℹ️ Install prompt not available');
                 return;
             }
-            
+
             // Show the install prompt
             deferredPrompt.prompt();
-            
+
             // Wait for the user to respond to the prompt
             const { outcome } = await deferredPrompt.userChoice;
-            
+
             if (outcome === 'accepted') {
                 console.log('✅ User accepted the install prompt');
             } else {
                 console.log('❌ User dismissed the install prompt');
             }
-            
+
             // Clear the deferredPrompt
             deferredPrompt = null;
         };
-        
+
         window.addEventListener('appinstalled', () => {
             console.log('✅ PWA installed successfully');
             deferredPrompt = null;
