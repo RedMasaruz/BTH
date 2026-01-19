@@ -6555,6 +6555,13 @@
 
         // Admin client-side manager (single IIFE)
         (function () {
+            // Configuration constants
+            const CONFIG = {
+                MAX_SEARCH_QUERY_LENGTH: 100,
+                SEARCH_DEBOUNCE_MS: 300,
+                MAX_SAFE_EXPORT_ROWS: 5000
+            };
+            
             // state
             let lastFetchedData = [];
             let currentDisplayKeys = []; // keep keys order used to render the table (for CSV export)
@@ -6819,9 +6826,8 @@
                         return;
                     }
 
-                    // Warn for large exports
-                    const MAX_SAFE = 5000;
-                    if (lastFetchedData.length > MAX_SAFE) {
+                    // Warn for large exports using config constant
+                    if (lastFetchedData.length > CONFIG.MAX_SAFE_EXPORT_ROWS) {
                         const ok = confirm(`กำลังดาวน์โหลด ${lastFetchedData.length} แถว ซึ่งอาจใช้เวลานานหรือทำให้เบราว์เซอร์หน่วง\nต้องการดำเนินการต่อหรือไม่?`);
                         if (!ok) return;
                     }
@@ -6895,30 +6901,47 @@
             };
 
             // ---------- Search/filter ----------
+            let searchDebounceTimer = null;
             window.adminFilterTable = function () {
-                try {
-                    const q = (document.getElementById('admin-search-input')?.value || '').trim().toLowerCase();
-                    if (!q) {
-                        displayTable(lastFetchedData);
-                        return;
-                    }
-                    const filtered = lastFetchedData.filter(row => {
-                        try {
-                            return Object.values(row).some(v => {
-                                if (v === null || v === undefined) return false;
-                                if (typeof v === 'object') {
-                                    try { v = JSON.stringify(v); } catch (e) { v = String(v); }
-                                }
-                                return String(v).toLowerCase().includes(q);
-                            });
-                        } catch (e) {
-                            return false;
-                        }
-                    });
-                    displayTable(filtered);
-                } catch (e) {
-                    console.error('adminFilterTable error:', e);
+                // Clear previous timer
+                if (searchDebounceTimer) {
+                    clearTimeout(searchDebounceTimer);
                 }
+                
+                // Debounce search using config constant
+                searchDebounceTimer = setTimeout(() => {
+                    try {
+                        const q = (document.getElementById('admin-search-input')?.value || '').trim().toLowerCase();
+                        if (!q) {
+                            displayTable(lastFetchedData);
+                            return;
+                        }
+                        
+                        // Validate search query length using config constant
+                        if (q.length > CONFIG.MAX_SEARCH_QUERY_LENGTH) {
+                            console.warn('Search query too long, truncating');
+                            document.getElementById('admin-search-input').value = q.substring(0, CONFIG.MAX_SEARCH_QUERY_LENGTH);
+                            return;
+                        }
+                        
+                        const filtered = lastFetchedData.filter(row => {
+                            try {
+                                return Object.values(row).some(v => {
+                                    if (v === null || v === undefined) return false;
+                                    if (typeof v === 'object') {
+                                        try { v = JSON.stringify(v); } catch (e) { v = String(v); }
+                                    }
+                                    return String(v).toLowerCase().includes(q);
+                                });
+                            } catch (e) {
+                                return false;
+                            }
+                        });
+                        displayTable(filtered);
+                    } catch (e) {
+                        console.error('adminFilterTable error:', e);
+                    }
+                }, CONFIG.SEARCH_DEBOUNCE_MS);
             };
 
             // ---------- Admin actions (fetch) ----------

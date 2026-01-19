@@ -65,6 +65,19 @@ const SURVEY_SHEET_NAME = "ข้อมูลพื้นที่ปลูก�
 const SLIDE_TEMPLATE_ID = "1NP9r9IfD5Zedc1lSKN0VNuPCfKz2_LmK_unmM1ayKyw";
 const PDF_FOLDER_ID = "1f-aL2Ychh2QaKzJdstr-WrvpaofnaGeP";
 
+// Security and validation constants
+const MAX_INPUT_LENGTH = 5000;
+const MAX_REQUESTS_PER_HOUR = 100;
+const TOKEN_EXPIRY_MS = 86400000; // 24 hours
+const MAX_PHONE_LENGTH = 20;
+const MIN_PHONE_FALLBACK_LENGTH = 15;
+const MAX_TOKEN_LENGTH = 1000;
+const RATE_LIMIT_WINDOW_SECONDS = 3600;
+const MAX_SEARCH_QUERY_LENGTH = 100;
+const SEARCH_DEBOUNCE_MS = 300;
+const MAX_SPECIES_COUNT = 1000000;
+const MAX_SPECIES_NAME_LENGTH = 100;
+
 /* ========== HTML / UI Helpers ========== */
 function include(filename) {
   return HtmlService.createHtmlOutputFromFile(filename).getContent();
@@ -110,11 +123,25 @@ function arraysEqual(a, b) {
 
 function sanitizeInput(input) {
   if (typeof input !== 'string') return input;
+  
+  // Limit maximum input length using constant
+  if (input.length > MAX_INPUT_LENGTH) {
+    Logger.log('Input too long, truncating from ' + input.length + ' to ' + MAX_INPUT_LENGTH);
+    input = input.substring(0, MAX_INPUT_LENGTH);
+  }
+  
+  // Prevent formula injection
   if (input.startsWith('=') || input.startsWith('+') || input.startsWith('-') || input.startsWith('@')) {
     input = "'" + input;
   }
-  input = input.substring(0, 1000);
+  
+  // Remove HTML/script tags (basic XSS prevention)
+  input = input.replace(/<script[^>]*>.*?<\/script>/gi, '');
   input = input.replace(/<[^>]*>/g, '');
+  
+  // Remove null bytes
+  input = input.replace(/\0/g, '');
+  
   return input.trim();
 }
 
@@ -122,8 +149,14 @@ function checkRateLimit(identifier) {
   const cache = CacheService.getScriptCache();
   const key = `rate_limit_${identifier || 'anon'}`;
   const count = parseInt(cache.get(key) || '0', 10);
-  if (count >= 200) throw new Error('คุณส่งข้อมูลบ่อยเกินไป กรุณารอสักครู่');
-  cache.put(key, (count + 1).toString(), 3600);
+  
+  // Use configurable rate limiting constants
+  if (count >= MAX_REQUESTS_PER_HOUR) {
+    Logger.log('Rate limit exceeded for: ' + identifier + ' (' + count + ' requests)');
+    throw new Error('คุณส่งข้อมูลบ่อยเกินไป กรุณารอสักครู่ (Rate limit: ' + MAX_REQUESTS_PER_HOUR + ' requests per hour)');
+  }
+  
+  cache.put(key, (count + 1).toString(), RATE_LIMIT_WINDOW_SECONDS);
 }
 
 function logAction(action, username, details) {
@@ -158,24 +191,49 @@ function formatDateToDDMMYYYY(input) {
     if (!s) return '';
     if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(s)) {
       const parts = s.split('/');
-      const day = ('0' + parts[0]).slice(-2);
-      const month = ('0' + parts[1]).slice(-2);
-      const year = parts[2];
-      return `${day}/${month}/${year}`;
+      const day = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10);
+      const year = parseInt(parts[2], 10);
+      
+      // Validate day/month ranges
+      if (day < 1 || day > 31 || month < 1 || month > 12 || year < 1900 || year > 2100) {
+        Logger.log('Invalid date values: ' + s);
+        return s; // Return original if validation fails
+      }
+      
+      const paddedDay = ('0' + day).slice(-2);
+      const paddedMonth = ('0' + month).slice(-2);
+      return `${paddedDay}/${paddedMonth}/${year}`;
     }
     const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
     if (m) {
+      const year = parseInt(m[1], 10);
+      const month = parseInt(m[2], 10);
+      const day = parseInt(m[3], 10);
+      
+      // Validate ranges
+      if (day < 1 || day > 31 || month < 1 || month > 12 || year < 1900 || year > 2100) {
+        Logger.log('Invalid ISO date values: ' + s);
+        return s;
+      }
+      
       return `${m[3]}/${m[2]}/${m[1]}`;
     }
     const parsed = new Date(s);
     if (!isNaN(parsed.getTime())) {
+      // Additional validation: check if year is reasonable
+      const year = parsed.getFullYear();
+      if (year < 1900 || year > 2100) {
+        Logger.log('Parsed date out of range: ' + s);
+        return s;
+      }
       const day = ('0' + parsed.getDate()).slice(-2);
       const month = ('0' + (parsed.getMonth() + 1)).slice(-2);
-      const year = parsed.getFullYear();
       return `${day}/${month}/${year}`;
     }
     return s;
   } catch (e) {
+    Logger.log('formatDateToDDMMYYYY error: ' + e.message + ' for input: ' + String(input));
     return String(input || '');
   }
 }
@@ -201,13 +259,28 @@ function sanitizePhoneForSheet(phone) {
   if (phone === undefined || phone === null) return '';
   let s = String(phone).trim();
   if (!s) return '';
+  
+  // Limit phone number length using constant
+  if (s.length > MAX_PHONE_LENGTH) {
+    Logger.log('Phone number too long, truncating: ' + s);
+    s = s.substring(0, MAX_PHONE_LENGTH);
+  }
+  
   // keep leading + if present
   if (s.startsWith('+')) {
     const digits = s.slice(1).replace(/\D/g, '');
     return digits ? ('+' + digits) : '';
   }
   // otherwise keep only digits
-  return s.replace(/\D/g, '');
+  const cleaned = s.replace(/\D/g, '');
+  
+  // Validate length (Thai numbers are typically 9-10 digits)
+  if (cleaned.length > 0 && cleaned.length <= MAX_PHONE_LENGTH) {
+    return cleaned;
+  }
+  
+  Logger.log('Invalid phone number format: ' + s);
+  return cleaned.substring(0, MIN_PHONE_FALLBACK_LENGTH); // Return truncated version using constant
 }
 
 /**
@@ -335,19 +408,56 @@ function generateSessionToken(username, longName) {
 }
 
 function validateSessionToken(token) {
-  if (!token) return null;
+  if (!token || typeof token !== 'string') return null;
+  
+  // Validate token length using constant
+  if (token.length > MAX_TOKEN_LENGTH) {
+    Logger.log('Token too long: ' + token.length);
+    return null;
+  }
+  
   try {
     const parts = token.split('.');
-    if (parts.length !== 2) return null;
+    if (parts.length !== 2) {
+      Logger.log('Invalid token format: expected 2 parts, got ' + parts.length);
+      return null;
+    }
+    
     const encodedData = parts[0];
     const encodedSignature = parts[1];
+    
+    // Validate base64 format
+    if (!encodedData || !encodedSignature) {
+      Logger.log('Token parts empty');
+      return null;
+    }
+    
     const expectedSignature = Utilities.computeHmacSha256Signature(encodedData, getSecretKey());
     const actualSignature = Utilities.base64Decode(encodedSignature);
-    if (!arraysEqual(expectedSignature, actualSignature)) return null;
+    
+    if (!arraysEqual(expectedSignature, actualSignature)) {
+      Logger.log('Token signature mismatch');
+      return null;
+    }
+    
     const tokenData = JSON.parse(Utilities.newBlob(Utilities.base64Decode(encodedData)).getDataAsString());
-    if (new Date().getTime() - tokenData.timestamp > 86400000) return null;
+    
+    // Validate token data structure
+    if (!tokenData || !tokenData.username || !tokenData.timestamp) {
+      Logger.log('Invalid token data structure');
+      return null;
+    }
+    
+    // Check token expiration using constant
+    const now = new Date().getTime();
+    if (now - tokenData.timestamp > TOKEN_EXPIRY_MS) {
+      Logger.log('Token expired: ' + ((now - tokenData.timestamp) / 3600000) + ' hours old');
+      return null;
+    }
+    
     return tokenData;
   } catch (e) {
+    Logger.log('Token validation error: ' + e.message);
     console.error('Token validation error:', e);
     return null;
   }
@@ -409,7 +519,7 @@ function isAdminUsername(username, password) {
     }
     
     const u = String(username).trim();
-    if (! u) {
+    if (!u) {
       console.log('Empty username after trim');
       return false;
     }
@@ -423,10 +533,10 @@ function isAdminUsername(username, password) {
     
     if (adminSheet) {
       const data = adminSheet.getDataRange().getValues();
-      console.log('UserAdmin sheet has', data ?  data.length : 0, 'rows');
+      console.log('UserAdmin sheet has', data ? data.length : 0, 'rows');
       
       if (data && data.length > 1) {
-        const headers = data[0]. map(h => String(h || '').toLowerCase().trim());
+        const headers = data[0].map(h => String(h || '').toLowerCase().trim());
         console.log('UserAdmin headers:', headers);
         
         const idxUser = headers.indexOf('username');
@@ -436,9 +546,9 @@ function isAdminUsername(username, password) {
           for (let i = 1; i < data.length; i++) {
             const row = data[i];
             const storedUser = String(row[idxUser] || '').trim();
-            console.log('Comparing:', u. toLowerCase(), 'with', storedUser. toLowerCase());
+            console.log('Comparing:', u.toLowerCase(), 'with', storedUser.toLowerCase());
             
-            if (storedUser. toLowerCase() === u.toLowerCase()) {
+            if (storedUser.toLowerCase() === u.toLowerCase()) {
               console.log('Found user in UserAdmin sheet');
               return true;
             }
@@ -448,15 +558,15 @@ function isAdminUsername(username, password) {
     }
 
     // 2) Check Users sheet for role
-    console.log('Checking Users sheet for role.. .');
+    console.log('Checking Users sheet for role...');
     const userSheet = ss.getSheetByName("Users");
     
     if (userSheet) {
       const udata = userSheet.getDataRange().getValues();
-      console.log('Users sheet has', udata ?  udata.length : 0, 'rows');
+      console.log('Users sheet has', udata ? udata.length : 0, 'rows');
       
-      if (udata && udata. length > 1) {
-        const uheaders = udata[0]. map(h => String(h || '').toLowerCase().trim());
+      if (udata && udata.length > 1) {
+        const uheaders = udata[0].map(h => String(h || '').toLowerCase().trim());
         console.log('Users headers:', uheaders);
         
         const idxUserU = uheaders.indexOf('username');
@@ -473,7 +583,7 @@ function isAdminUsername(username, password) {
             
             if (storedUser && storedUser.toLowerCase() === u.toLowerCase()) {
               if (storedRole === 'admin' || storedRole === 'superadmin') {
-                console. log('Found admin role in Users sheet');
+                console.log('Found admin role in Users sheet');
                 return true;
               }
             }
@@ -531,8 +641,33 @@ function createUserAdminSheet() {
 }
 
 function setupAdminUser() {
-    const result = addAdminUser('admin', 'your_password_here', 'ผู้ดูแลระบบหลัก', 'admin@example.com', 'superadmin');
-    console.log('Setup result:', result);
+    // SECURITY WARNING: This function is for INITIAL SETUP ONLY!
+    // 
+    // ⚠️ IMPORTANT SECURITY NOTES:
+    // 1. This default password MUST be changed immediately after first use
+    // 2. DO NOT use this function in production without changing the password
+    // 3. For production deployments, use PropertiesService to store passwords securely:
+    //    PropertiesService.getScriptProperties().setProperty('ADMIN_PASSWORD', 'your_secure_password')
+    // 4. Consider implementing a proper bootstrap/initialization flow
+    //
+    // Better approach for production:
+    // const password = PropertiesService.getScriptProperties().getProperty('ADMIN_INITIAL_PASSWORD');
+    // if (!password) throw new Error('ADMIN_INITIAL_PASSWORD not set in Script Properties');
+    
+    const DEFAULT_PASSWORD = 'CHANGE_ME_IMMEDIATELY';
+    
+    Logger.log('⚠️ WARNING: Using default admin password - MUST be changed!');
+    const result = addAdminUser('admin', DEFAULT_PASSWORD, 'ผู้ดูแลระบบหลัก', 'admin@example.com', 'superadmin');
+    
+    if (result.success) {
+        console.warn('🔒 CRITICAL SECURITY NOTICE:');
+        console.warn('   1. Change the admin password IMMEDIATELY');
+        console.warn('   2. Use the admin panel or call: addAdminUser("admin", "YOUR_SECURE_PASSWORD", ...)');
+        console.warn('   3. For production, use Script Properties for password storage');
+        console.warn('   4. Delete this function after initial setup is complete');
+    }
+    
+    return result;
 }
 
 /**
@@ -1055,17 +1190,24 @@ function buildSpeciesColumns(data) {
     greenDetails: "-",
     greenTotal: 0
   };
-  if (!data || !data.species) return res;
+  
+  // Validate input
+  if (!data || typeof data !== 'object') return res;
+  if (!data.species || typeof data.species !== 'object') return res;
 
   const details = { red: [], white: [], green: [] };
   const totals = { red: 0, white: 0, green: 0 };
 
   ['red', 'white', 'green'].forEach(stem => {
-    const group = data.species[stem] || {};
-    Object.keys(group || {}).forEach(varName => {
+    const group = data.species[stem];
+    if (!group || typeof group !== 'object') return;
+    
+    Object.keys(group).forEach(varName => {
       const count = Number(group[varName]) || 0;
-      if (count > 0) {
-        details[stem].push(`${varName}: ${count} ต้น`);
+      // Validate count is reasonable using constant
+      if (count > 0 && count <= MAX_SPECIES_COUNT) {
+        const safeName = String(varName).substring(0, MAX_SPECIES_NAME_LENGTH); // Limit name length using constant
+        details[stem].push(`${safeName}: ${count} ต้น`);
         totals[stem] += count;
       }
     });
@@ -1082,11 +1224,17 @@ function buildSpeciesColumns(data) {
   if (details.red.length) combinedParts.push(`ก้านแดง - ${details.red.join(', ')}`);
   if (details.white.length) combinedParts.push(`ก้านขาว - ${details.white.join(', ')}`);
   if (details.green.length) combinedParts.push(`ก้านเขียว - ${details.green.join(', ')}`);
+  
   if (data.other_varieties) {
-    const others = String(data.other_varieties).split(',').map(s => s.trim()).filter(Boolean);
+    const othersRaw = String(data.other_varieties).substring(0, 500); // Limit length
+    const others = othersRaw.split(',').map(s => s.trim()).filter(Boolean);
     if (others.length) combinedParts.push(`อื่นๆ: ${others.join(', ')}`);
   }
-  if (data.special_species_name) combinedParts.push(`ข้ามสายพันธุ์: ${data.special_species_name}`);
+  
+  if (data.special_species_name) {
+    const specialName = String(data.special_species_name).substring(0, 200);
+    combinedParts.push(`ข้ามสายพันธุ์: ${specialName}`);
+  }
 
   res.combined = combinedParts.length ? combinedParts.join(', ') : '-';
   return res;
@@ -1393,7 +1541,7 @@ function getAllFarmers(token) {
     
     const session = validateSessionToken(token);
     if (!session) return { success: false, message: 'Unauthorized' };
-    if (!isAdminUsername(session.username)) return { success: false, message: 'Forbidden:  not admin' };
+    if (!isAdminUsername(session.username)) return { success: false, message: 'Forbidden: not admin' };
 
     const ss = SpreadsheetApp.openById(SPREADSHEET_ID_A);
     const sheet = ss.getSheetByName(SHEET_A_NAME);
@@ -1411,7 +1559,7 @@ function getAllFarmers(token) {
         
         // แปลง Date objects เป็น string เพื่อให้ส่งผ่าน JSON ได้
         if (Object.prototype.toString.call(value) === '[object Date]') {
-          if (! isNaN(value. getTime())) {
+          if (!isNaN(value.getTime())) {
             value = value.toISOString(); // หรือใช้ value.toLocaleDateString('th-TH') สำหรับรูปแบบไทย
           } else {
             value = ''; // Invalid date
@@ -1433,7 +1581,7 @@ function getAllFarmers(token) {
     
   } catch (e) {
     console.error('getAllFarmers error:', e);
-    return { success: false, message: 'เกิดข้อผิดพลาด:  ' + e.message };
+    return { success: false, message: 'เกิดข้อผิดพลาด: ' + e.message };
   }
 }
 
@@ -1445,7 +1593,7 @@ function getAllUsage(token) {
   try {
     const session = validateSessionToken(token);
     if (!session) return { success: false, message: 'Unauthorized' };
-    if (! isAdminUsername(session.username)) return { success: false, message: 'Forbidden: not admin' };
+    if (!isAdminUsername(session.username)) return { success: false, message: 'Forbidden: not admin' };
 
     const ss = SpreadsheetApp.openById(SPREADSHEET_ID_B);
     const sheets = ss.getSheets();
@@ -1454,7 +1602,7 @@ function getAllUsage(token) {
     sheets.forEach(sheet => {
       const sheetName = sheet.getName();
       const values = sheet.getDataRange().getValues();
-      if (! values || values.length < 2) return;
+      if (!values || values.length < 2) return;
       
       const headers = values[0];
       for (let i = 1; i < values.length; i++) {
@@ -1492,12 +1640,12 @@ function getAllUsage(token) {
 function getAllMerged(token) {
   try {
     const session = validateSessionToken(token);
-    if (!session) return { success: false, message:  'Unauthorized' };
-    if (!isAdminUsername(session.username)) return { success: false, message: 'Forbidden:  not admin' };
+    if (!session) return { success: false, message: 'Unauthorized' };
+    if (!isAdminUsername(session.username)) return { success: false, message: 'Forbidden: not admin' };
 
     // Get farmers data (แปลง Date แล้ว)
     const farmersResult = getAllFarmers(token);
-    if (!farmersResult. success) return farmersResult;
+    if (!farmersResult.success) return farmersResult;
     const farmers = farmersResult.data || [];
 
     // Get usage data (แปลง Date แล้ว)  
@@ -1523,13 +1671,13 @@ function getAllMerged(token) {
           const parsed = new Date(timeValue);
           if (!isNaN(parsed.getTime())) ts = parsed.getTime();
         } else if (Object.prototype.toString.call(timeValue) === '[object Date]') {
-          if (!isNaN(timeValue. getTime())) ts = timeValue.getTime();
+          if (!isNaN(timeValue.getTime())) ts = timeValue.getTime();
         }
       }
       
       usage._timestamp = ts;
       
-      if (! existing || (existing._timestamp && usage._timestamp > existing._timestamp)) {
+      if (!existing || (existing._timestamp && usage._timestamp > existing._timestamp)) {
         usageMap[key] = usage;
       }
     });
@@ -1547,10 +1695,10 @@ function getAllMerged(token) {
       };
     });
 
-    return { success: true, message: `รวมข้อมูล ${merged. length} รายการ`, data: merged };
+    return { success: true, message: `รวมข้อมูล ${merged.length} รายการ`, data: merged };
   } catch (e) {
     console.error('getAllMerged error:', e);
-    return { success: false, message: 'เกิดข้อผิดพลาด: ' + e. message };
+    return { success: false, message: 'เกิดข้อผิดพลาด: ' + e.message };
   }
 }
 
@@ -1584,7 +1732,7 @@ function testAdminAccess(token) {
     
     console.log('Testing with token present:', result.step1_tokenPresent);
     
-    if (! token) {
+    if (!token) {
       result.error = 'No token provided';
       console.log('-> No token, returning early');
       return result;
@@ -1637,7 +1785,7 @@ function testAdminAccess(token) {
       if (sheet) {
         console.log('   Sheet found, getting dimensions...');
         const lastRow = sheet.getLastRow();
-        const lastCol = sheet. getLastColumn();
+        const lastCol = sheet.getLastColumn();
         
         result.step6_dataAccess = {
           lastRow: lastRow,
@@ -1645,14 +1793,14 @@ function testAdminAccess(token) {
           hasData: lastRow > 1
         };
         
-        console. log('   Sheet dimensions:', result.step6_dataAccess);
+        console.log('   Sheet dimensions:', result.step6_dataAccess);
         
         // Try to call getAllFarmers directly
         console.log('Step 5: Testing getAllFarmers function...');
         const farmersResult = getAllFarmers(token);
         result.details.getAllFarmersTest = {
-          success: farmersResult ?  farmersResult.success : false,
-          message: farmersResult ?  farmersResult.message : 'NULL returned',
+          success: farmersResult ? farmersResult.success : false,
+          message: farmersResult ? farmersResult.message : 'NULL returned',
           dataCount: farmersResult && farmersResult.data ? farmersResult.data.length : 'NO DATA'
         };
         console.log('   getAllFarmers result:', result.details.getAllFarmersTest);
@@ -1664,7 +1812,7 @@ function testAdminAccess(token) {
       
     } catch (e) {
       result.step4_spreadsheetAccess = false;
-      result.error = `Spreadsheet access failed: ${e. message}`;
+      result.error = `Spreadsheet access failed: ${e.message}`;
       console.log('   Spreadsheet access error:', e.message);
     }
     
@@ -1692,11 +1840,11 @@ function testSpreadsheetAccess() {
     
     // Test Spreadsheet A
     try {
-      const ssA = SpreadsheetApp. openById(SPREADSHEET_ID_A);
+      const ssA = SpreadsheetApp.openById(SPREADSHEET_ID_A);
       results.spreadsheetA = {
         success: true,
         sheets: ssA.getSheets().map(s => s.getName()),
-        targetSheet:  SHEET_A_NAME,
+        targetSheet: SHEET_A_NAME,
         targetSheetExists: !!ssA.getSheetByName(SHEET_A_NAME)
       };
     } catch (e) {
