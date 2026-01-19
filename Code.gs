@@ -65,6 +65,16 @@ const SURVEY_SHEET_NAME = "ข้อมูลพื้นที่ปลูก�
 const SLIDE_TEMPLATE_ID = "1NP9r9IfD5Zedc1lSKN0VNuPCfKz2_LmK_unmM1ayKyw";
 const PDF_FOLDER_ID = "1f-aL2Ychh2QaKzJdstr-WrvpaofnaGeP";
 
+// Security and validation constants
+const MAX_INPUT_LENGTH = 5000;
+const MAX_REQUESTS_PER_HOUR = 100;
+const TOKEN_EXPIRY_MS = 86400000; // 24 hours
+const MAX_PHONE_LENGTH = 20;
+const MAX_TOKEN_LENGTH = 1000;
+const RATE_LIMIT_WINDOW_SECONDS = 3600;
+const MAX_SEARCH_QUERY_LENGTH = 100;
+const SEARCH_DEBOUNCE_MS = 300;
+
 /* ========== HTML / UI Helpers ========== */
 function include(filename) {
   return HtmlService.createHtmlOutputFromFile(filename).getContent();
@@ -111,8 +121,7 @@ function arraysEqual(a, b) {
 function sanitizeInput(input) {
   if (typeof input !== 'string') return input;
   
-  // Limit maximum input length
-  const MAX_INPUT_LENGTH = 5000;
+  // Limit maximum input length using constant
   if (input.length > MAX_INPUT_LENGTH) {
     Logger.log('Input too long, truncating from ' + input.length + ' to ' + MAX_INPUT_LENGTH);
     input = input.substring(0, MAX_INPUT_LENGTH);
@@ -138,16 +147,13 @@ function checkRateLimit(identifier) {
   const key = `rate_limit_${identifier || 'anon'}`;
   const count = parseInt(cache.get(key) || '0', 10);
   
-  // More strict rate limiting: 100 requests per hour
-  const MAX_REQUESTS_PER_HOUR = 100;
-  const WINDOW_SECONDS = 3600;
-  
+  // Use configurable rate limiting constants
   if (count >= MAX_REQUESTS_PER_HOUR) {
     Logger.log('Rate limit exceeded for: ' + identifier + ' (' + count + ' requests)');
     throw new Error('คุณส่งข้อมูลบ่อยเกินไป กรุณารอสักครู่ (Rate limit: ' + MAX_REQUESTS_PER_HOUR + ' requests per hour)');
   }
   
-  cache.put(key, (count + 1).toString(), WINDOW_SECONDS);
+  cache.put(key, (count + 1).toString(), RATE_LIMIT_WINDOW_SECONDS);
 }
 
 function logAction(action, username, details) {
@@ -251,10 +257,10 @@ function sanitizePhoneForSheet(phone) {
   let s = String(phone).trim();
   if (!s) return '';
   
-  // Limit phone number length for safety (reasonable max is 20 characters)
-  if (s.length > 20) {
+  // Limit phone number length using constant
+  if (s.length > MAX_PHONE_LENGTH) {
     Logger.log('Phone number too long, truncating: ' + s);
-    s = s.substring(0, 20);
+    s = s.substring(0, MAX_PHONE_LENGTH);
   }
   
   // keep leading + if present
@@ -266,7 +272,7 @@ function sanitizePhoneForSheet(phone) {
   const cleaned = s.replace(/\D/g, '');
   
   // Validate length (Thai numbers are typically 9-10 digits)
-  if (cleaned.length > 0 && cleaned.length < 20) {
+  if (cleaned.length > 0 && cleaned.length < MAX_PHONE_LENGTH) {
     return cleaned;
   }
   
@@ -401,8 +407,8 @@ function generateSessionToken(username, longName) {
 function validateSessionToken(token) {
   if (!token || typeof token !== 'string') return null;
   
-  // Validate token format
-  if (token.length > 1000) {
+  // Validate token length using constant
+  if (token.length > MAX_TOKEN_LENGTH) {
     Logger.log('Token too long: ' + token.length);
     return null;
   }
@@ -439,8 +445,7 @@ function validateSessionToken(token) {
       return null;
     }
     
-    // Check token expiration (24 hours)
-    const TOKEN_EXPIRY_MS = 86400000; // 24 hours
+    // Check token expiration using constant
     const now = new Date().getTime();
     if (now - tokenData.timestamp > TOKEN_EXPIRY_MS) {
       Logger.log('Token expired: ' + ((now - tokenData.timestamp) / 3600000) + ' hours old');
@@ -633,12 +638,18 @@ function createUserAdminSheet() {
 }
 
 function setupAdminUser() {
-    // SECURITY WARNING: Change the password immediately after first run!
-    // This is a helper function for initial setup only.
-    // Do not commit actual passwords to version control.
-    const result = addAdminUser('admin', 'CHANGE_ME_IMMEDIATELY', 'ผู้ดูแลระบบหลัก', 'admin@example.com', 'superadmin');
+    // SECURITY WARNING: This function is for INITIAL SETUP ONLY!
+    // The password MUST be changed immediately after first use.
+    // DO NOT use this in production with the default password.
+    // Consider using Script Properties or environment variables for secure password management.
+    
+    const DEFAULT_PASSWORD = 'CHANGE_ME_IMMEDIATELY';
+    
+    Logger.log('⚠️ WARNING: Using default admin password - MUST be changed!');
+    const result = addAdminUser('admin', DEFAULT_PASSWORD, 'ผู้ดูแลระบบหลัก', 'admin@example.com', 'superadmin');
     console.log('Setup result:', result);
-    console.warn('⚠️ SECURITY: Please change the admin password immediately!');
+    console.warn('🔒 SECURITY: Change the admin password IMMEDIATELY using the admin panel!');
+    console.warn('📝 To set a secure password, use: addAdminUser("admin", "YOUR_SECURE_PASSWORD", ...)');
     return result;
 }
 
