@@ -7162,14 +7162,7 @@
                 }
 
                 // Use helper function for consistency
-                if (typeof showAdminView === 'function') {
-                    showAdminView();
-                } else {
-                    // Fallback if helper not available
-                    if (warning) warning.classList.add('hidden');
-                    if (controls) controls.classList.remove('hidden');
-                    if (typeof navigateTo === 'function') navigateTo('admin-view');
-                }
+                showAdminView();
             };
 
             function showLoading(show = true) {
