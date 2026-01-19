@@ -1310,8 +1310,7 @@
                     <div id="admin-login-error" class="text-red-500 text-sm hidden text-center"></div>
 
                     <button id="admin-login-submit" type="submit" 
-                        class="w-full py-3 rounded-lg font-semibold text-white"
-                        style="background: linear-gradient(135deg, #0f766e 0%, #10b981 100%);">
+                        class="w-full py-3 rounded-lg font-semibold text-white bg-gradient-to-br from-teal-700 to-emerald-500 hover:from-teal-800 hover:to-emerald-600">
                         เข้าสู่ระบบ
                     </button>
                     <button type="button" onclick="hideAdminLoginModal()"
@@ -4939,6 +4938,25 @@
         // =============================================
         // ADMIN LOGIN FUNCTIONS (INDEPENDENT)
         // =============================================
+        
+        // Helper function to show admin view after successful login
+        function showAdminView() {
+            const warning = document.getElementById('admin-access-warning');
+            const controls = document.getElementById('admin-controls');
+            const currentUserEl = document.getElementById('admin-current-user');
+            
+            if (warning) warning.classList.add('hidden');
+            if (controls) controls.classList.remove('hidden');
+            
+            const username = sessionStorage.getItem('username') || '';
+            const longName = sessionStorage.getItem('longName') || '';
+            if (currentUserEl) {
+                currentUserEl.textContent = username ? `${username} (${longName || '-'})` : 'ไม่ได้ล็อกอิน';
+            }
+            
+            if (typeof navigateTo === 'function') navigateTo('admin-view');
+        }
+        
         async function handleAdminLogin(event) {
             event.preventDefault();
 
@@ -4985,6 +5003,8 @@
                         } else {
                             showMessageBox("❌ ไม่มีสิทธิ์", errorMessage);
                         }
+                        submitButton.disabled = false;
+                        submitButton.innerHTML = 'เข้าสู่ระบบ';
                         return;
                     }
                     
@@ -4996,12 +5016,8 @@
 
                     hideAdminLoginModal();
 
-                    // Navigate directly to admin view
-                    const warning = document.getElementById('admin-access-warning');
-                    const controls = document.getElementById('admin-controls');
-                    if (warning) warning.classList.add('hidden');
-                    if (controls) controls.classList.remove('hidden');
-                    if (typeof navigateTo === 'function') navigateTo('admin-view');
+                    // Navigate to admin view using helper function
+                    showAdminView();
 
                     showMessageBox("✅ เข้าสู่ระบบผู้ดูแลสำเร็จ", `ยินดีต้อนรับ ${response.username}`);
                 } else {
@@ -7145,9 +7161,15 @@
                     return;
                 }
 
-                if (warning) warning.classList.add('hidden');
-                if (controls) controls.classList.remove('hidden');
-                if (typeof navigateTo === 'function') navigateTo('admin-view');
+                // Use helper function for consistency
+                if (typeof showAdminView === 'function') {
+                    showAdminView();
+                } else {
+                    // Fallback if helper not available
+                    if (warning) warning.classList.add('hidden');
+                    if (controls) controls.classList.remove('hidden');
+                    if (typeof navigateTo === 'function') navigateTo('admin-view');
+                }
             };
 
             function showLoading(show = true) {
