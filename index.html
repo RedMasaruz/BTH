@@ -3488,8 +3488,8 @@
                 updateSheetALongDropdown();
             }
 
-            // Update long dropdowns for Sheet B views when user is logged in
-            if (viewId === 'sheet-b-view' || viewId === 'sheet-b-use-view') {
+            // Update long dropdowns for Sheet B view when user is logged in
+            if (viewId === 'sheet-b-view') {
                 console.log(`📋 Showing ${viewId}, checking login status...`);
                 const currentUser = checkLoginStatus();
                 if (currentUser && currentUser.longName) {
@@ -3498,6 +3498,16 @@
                 } else {
                     console.log('❌ No user logged in or no longName');
                 }
+            }
+            
+            // For sheet-b-use-view, optionally auto-select if user is logged in, but don't require it
+            if (viewId === 'sheet-b-use-view') {
+                const currentUser = checkLoginStatus();
+                if (currentUser && currentUser.longName) {
+                    console.log(`✅ User logged in as ${currentUser.longName}, auto-selecting dropdown`);
+                    updateAllLongDropdowns(currentUser.longName);
+                }
+                // No error message if not logged in - this is allowed
             }
 
             updateBackButton(viewId);
@@ -7131,6 +7141,40 @@
                 isFetching = flag;
                 setAdminControlsDisabled(flag);
                 showLoading(flag);
+            }
+
+            // Debug helper to fetch and display admin debug info
+            function fetchAndShowAdminDebug(token, context) {
+                if (!token) {
+                    console.warn('fetchAndShowAdminDebug: no token provided');
+                    return;
+                }
+                
+                try {
+                    console.log('fetchAndShowAdminDebug called with context:', context);
+                    
+                    if (typeof google === 'undefined' || !google.script || !google.script.run) {
+                        console.error('fetchAndShowAdminDebug: google.script.run not available');
+                        return;
+                    }
+                    
+                    google.script.run
+                        .withSuccessHandler(result => {
+                            console.log('Debug info fetched successfully:', result);
+                            if (typeof showMessageBox === 'function') {
+                                showMessageBox('🔍 Debug Info - ' + escapeHtml(context), `<pre style="white-space:pre-wrap;">${escapeHtml(JSON.stringify(result, null, 2))}</pre>`);
+                            }
+                        })
+                        .withFailureHandler(err => {
+                            console.error('fetchAndShowAdminDebug failed:', err);
+                            if (typeof showMessageBox === 'function') {
+                                showMessageBox('❌ Debug fetch failed', escapeHtml((err && err.message) || 'Unknown error'));
+                            }
+                        })
+                        .getAllFarmersDebug(token);
+                } catch (e) {
+                    console.error('fetchAndShowAdminDebug exception:', e);
+                }
             }
 
             window.adminFetchAllFarmers = function () {
