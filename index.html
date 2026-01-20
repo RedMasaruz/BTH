@@ -1299,11 +1299,13 @@
                     <div>
                         <label for="admin-username" class="block text-sm font-medium mb-1 text-stone-700">Admin Username</label>
                         <input type="text" id="admin-username" placeholder="admin username" required
+                            maxlength="50" autocomplete="username"
                             class="w-full p-3 border border-stone-300 rounded-lg focus:border-teal-600 focus:ring-2 focus:ring-teal-200">
                     </div>
                     <div>
                         <label for="admin-password" class="block text-sm font-medium mb-1 text-stone-700">Admin Password</label>
                         <input type="password" id="admin-password" placeholder="admin password" required
+                            maxlength="100" autocomplete="current-password"
                             class="w-full p-3 border border-stone-300 rounded-lg focus:border-teal-600 focus:ring-2 focus:ring-teal-200">
                     </div>
                     <div id="admin-login-error" class="text-red-500 text-sm hidden text-center"></div>
@@ -3250,6 +3252,7 @@
 
                     <div class="flex gap-3">
                         <input id="admin-search-input" type="text" placeholder="ค้นหาตามรหัส หรือ ชื่อ"
+                            maxlength="100"
                             class="w-full p-2 border rounded" />
                         <button id="admin-search-btn" class="search-button px-4"
                             onclick="adminFilterTable()">ค้นหา</button>
@@ -3261,17 +3264,6 @@
                     <div id="admin-loading" class="text-center p-6 hidden">
                         <div class="loading-spinner mx-auto mb-2"></div>
                         กำลังโหลดข้อมูล...
-                    </div>
-
-                    <div id="admin-results" class="space-y-4">
-                        <div id="admin-table-wrapper" class="overflow-x-auto bg-white rounded-lg border p-4 hidden">
-                            <h3 class="font-semibold text-stone-700 mb-2">ผลลัพธ์</h3>
-                            <div id="admin-table-container" class="admin-table-scroll"></div>
-                        </div>
-
-                        <div id="admin-empty" class="text-stone-500 p-4 hidden">
-                            ยังไม่มีข้อมูลที่จะแสดง
-                        </div>
                     </div>
 
                     <div id="admin-results" class="space-y-4">
@@ -4975,6 +4967,7 @@
             const errorElement = document.getElementById('admin-login-error');
             const submitButton = event.target.querySelector('button[type="submit"]');
 
+            // Enhanced validation
             if (!username || !password) {
                 const errorMessage = "กรุณากรอก Admin Username และ Password";
                 if (errorElement) {
@@ -4983,6 +4976,45 @@
                 } else {
                     showMessageBox("❌ ข้อมูลไม่ครบ", errorMessage);
                 }
+                return;
+            }
+
+            // Input length validation
+            if (username.length > 50) {
+                const errorMessage = "Username ยาวเกินไป";
+                if (errorElement) {
+                    errorElement.textContent = errorMessage;
+                    errorElement.classList.remove('hidden');
+                }
+                return;
+            }
+
+            if (password.length > 100) {
+                const errorMessage = "Password ยาวเกินไป";
+                if (errorElement) {
+                    errorElement.textContent = errorMessage;
+                    errorElement.classList.remove('hidden');
+                }
+                return;
+            }
+
+            // Check rate limiting
+            if (typeof window._adminRateLimitCheck === 'function') {
+                const rateLimitResult = window._adminRateLimitCheck();
+                if (!rateLimitResult.allowed) {
+                    const errorMessage = `คุณพยายามเข้าสู่ระบบหลายครั้งเกินไป กรุณารออีก ${rateLimitResult.waitMinutes} นาที`;
+                    if (errorElement) {
+                        errorElement.textContent = errorMessage;
+                        errorElement.classList.remove('hidden');
+                    } else {
+                        showMessageBox("❌ ถูกจำกัดการเข้าถึง", errorMessage);
+                    }
+                    return;
+                }
+            }
+
+            // Prevent multiple simultaneous login attempts
+            if (submitButton.disabled) {
                 return;
             }
 
@@ -4995,9 +5027,20 @@
 
             try {
                 const response = await new Promise((resolve, reject) => {
+                    // Set timeout for login request
+                    const timeoutId = setTimeout(() => {
+                        reject(new Error('การเชื่อมต่อหมดเวลา กรุณาลองอีกครั้ง'));
+                    }, 30000); // 30 second timeout
+
                     google.script.run
-                        .withSuccessHandler(resolve)
-                        .withFailureHandler(reject)
+                        .withSuccessHandler((result) => {
+                            clearTimeout(timeoutId);
+                            resolve(result);
+                        })
+                        .withFailureHandler((error) => {
+                            clearTimeout(timeoutId);
+                            reject(error);
+                        })
                         .userLogin(username, password);
                 });
 
@@ -5018,9 +5061,18 @@
                         return;
                     }
                     
+                    // Validate response data before storing
+                    if (!response.token || typeof response.token !== 'string' || response.token.length === 0) {
+                        throw new Error('Invalid token received from server');
+                    }
+                    
+                    if (!response.username || typeof response.username !== 'string' || response.username.length === 0) {
+                        throw new Error('Invalid username received from server');
+                    }
+
                     // Store admin session data
                     sessionStorage.setItem('sessionToken', response.token);
-                    sessionStorage.setItem('longName', response.longName);
+                    sessionStorage.setItem('longName', response.longName || '');
                     sessionStorage.setItem('username', response.username);
                     // We already validated isAdmin is true, so set it directly
                     sessionStorage.setItem('isAdmin', 'true');
@@ -5042,7 +5094,7 @@
                 }
             } catch (error) {
                 console.error('❌ ข้อผิดพลาดในการล็อกอินผู้ดูแล:', error);
-                const errorMessage = "เกิดข้อผิดพลาดในการเชื่อมต่อระบบ";
+                const errorMessage = error && error.message ? error.message : "เกิดข้อผิดพลาดในการเชื่อมต่อระบบ";
                 if (errorElement) {
                     errorElement.textContent = errorMessage;
                     errorElement.classList.remove('hidden');
@@ -6930,7 +6982,9 @@
             const CONFIG = {
                 MAX_SEARCH_QUERY_LENGTH: 100,
                 SEARCH_DEBOUNCE_MS: 300,
-                MAX_SAFE_EXPORT_ROWS: 5000
+                MAX_SAFE_EXPORT_ROWS: 5000,
+                MAX_LOGIN_ATTEMPTS: 5,
+                LOGIN_ATTEMPT_WINDOW_MS: 300000 // 5 minutes
             };
             
             // state
@@ -6938,6 +6992,30 @@
             let currentDisplayKeys = []; // keep keys order used to render the table (for CSV export)
             let isTableExpanded = false;
             let isFetching = false;
+            
+            // Rate limiting state for admin login
+            let adminLoginAttempts = [];
+            
+            // Rate limiting helper
+            function checkAdminLoginRateLimit() {
+                const now = Date.now();
+                // Remove attempts older than the window
+                adminLoginAttempts = adminLoginAttempts.filter(timestamp => 
+                    now - timestamp < CONFIG.LOGIN_ATTEMPT_WINDOW_MS
+                );
+                
+                if (adminLoginAttempts.length >= CONFIG.MAX_LOGIN_ATTEMPTS) {
+                    const oldestAttempt = Math.min(...adminLoginAttempts);
+                    const waitTime = Math.ceil((CONFIG.LOGIN_ATTEMPT_WINDOW_MS - (now - oldestAttempt)) / 1000 / 60);
+                    return { allowed: false, waitMinutes: waitTime };
+                }
+                
+                adminLoginAttempts.push(now);
+                return { allowed: true };
+            }
+            
+            // Expose rate limit check to handleAdminLogin
+            window._adminRateLimitCheck = checkAdminLoginRateLimit;
 
             // ---------- Utilities ----------
             function escapeHtml(str) {
@@ -7246,6 +7324,12 @@
                             // Replace CRLF/CR with LF to avoid CSV injection problems (but keep newlines)
                             s = s.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
                             s = s.replace(/"/g, '""');
+                            
+                            // CSV Injection Prevention: If cell starts with formula characters, prepend single quote
+                            if (s.length > 0 && /^[=+\-@\t\r]/.test(s)) {
+                                s = "'" + s;
+                            }
+                            
                             return `"${s}"`;
                         }).join(',');
                         rows.push(row);
@@ -7655,14 +7739,16 @@
                     .getAllFarmersDebug(token);
             };
 
-            // expose internal helpers for debugging
-            window._admin_internal = {
-                displayTable,
-                isAdminSession,
-                fetchAndShowAdminDebug,
-                getCurrentDisplayKeys: () => currentDisplayKeys.slice(),
-                getLastFetchedData: () => lastFetchedData.slice()
-            };
+            // Expose minimal helpers for debugging (avoid exposing sensitive data)
+            if (typeof console !== 'undefined' && console.log) {
+                window._admin_internal = {
+                    getStats: () => ({
+                        dataCount: lastFetchedData.length,
+                        columnsCount: currentDisplayKeys.length,
+                        isAdminSession: isAdminSession()
+                    })
+                };
+            }
 
             // observer to auto-call adminCheckAuthAndInit when view shown (if you use navigateTo)
             const adminView = document.getElementById('admin-view');
