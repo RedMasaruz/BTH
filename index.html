@@ -1287,8 +1287,8 @@
     <div id="admin-login" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black bg-opacity-60">
         <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4 border-t-4 border-teal-700">
             <div class="flex items-center justify-center mb-6">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-teal-600 mr-3" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor" stroke-width="1.8">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-teal-600 mr-3" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M12 11c2.21 0 4-1.79 4-4S14.21 3 12 3 8 4.79 8 7s1.79 4 4 4zM6 20a6 6 0 0112 0" />
                 </svg>
@@ -1297,20 +1297,22 @@
             <form id="admin-login-form" onsubmit="handleAdminLogin(event)">
                 <div class="space-y-4">
                     <div>
-                        <label for="admin-username" class="block text-sm font-medium mb-1 text-stone-700">Admin Username</label>
-                        <input type="text" id="admin-username" placeholder="admin username" required
-                            maxlength="50" autocomplete="username"
+                        <label for="admin-username" class="block text-sm font-medium mb-1 text-stone-700">Admin
+                            Username</label>
+                        <input type="text" id="admin-username" placeholder="admin username" required maxlength="50"
+                            autocomplete="username"
                             class="w-full p-3 border border-stone-300 rounded-lg focus:border-teal-600 focus:ring-2 focus:ring-teal-200">
                     </div>
                     <div>
-                        <label for="admin-password" class="block text-sm font-medium mb-1 text-stone-700">Admin Password</label>
-                        <input type="password" id="admin-password" placeholder="admin password" required
-                            maxlength="100" autocomplete="current-password"
+                        <label for="admin-password" class="block text-sm font-medium mb-1 text-stone-700">Admin
+                            Password</label>
+                        <input type="password" id="admin-password" placeholder="admin password" required maxlength="100"
+                            autocomplete="current-password"
                             class="w-full p-3 border border-stone-300 rounded-lg focus:border-teal-600 focus:ring-2 focus:ring-teal-200">
                     </div>
                     <div id="admin-login-error" class="text-red-500 text-sm hidden text-center"></div>
 
-                    <button id="admin-login-submit" type="submit" 
+                    <button id="admin-login-submit" type="submit"
                         class="w-full py-3 rounded-lg font-semibold text-white bg-gradient-to-br from-teal-700 to-emerald-500 hover:from-teal-800 hover:to-emerald-600">
                         เข้าสู่ระบบ
                     </button>
@@ -1533,7 +1535,10 @@
                                             อำเภอ เกาะจันทร์ จังหวัด ชลบุรี 20240</p>
                                         <p class="mb-2 text-xs md:text-sm">
                                             ช่องทางติดต่อ:
-                                            <a href="tel:0924579929" class="text-green-600 font-semibold">092-4579929</a> | <a href="tel:0635033042" class="text-green-600 font-semibold">063-5033042</a>
+                                            <a href="tel:0924579929"
+                                                class="text-green-600 font-semibold">092-4579929</a> | <a
+                                                href="tel:0635033042"
+                                                class="text-green-600 font-semibold">063-5033042</a>
                                         </p>
                                     </div>
                                     <img src="https://i.postimg.cc/rsL6ZK4T/image.jpg" alt="BTH Logo"
@@ -2427,7 +2432,8 @@
                                 d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                         </svg>
                     </div>
-                    <h2 class="text-xl font-bold text-stone-800 mb-2">จัดติดตั้ง Barcode & QRCode และการจัดส่ง (กำลังแก้ไข)</h2>
+                    <h2 class="text-xl font-bold text-stone-800 mb-2">จัดติดตั้ง Barcode & QRCode และการจัดส่ง
+                        (กำลังแก้ไข)</h2>
                     <p class="text-sm text-stone-600"></p>
                 </div>
 
@@ -3251,8 +3257,7 @@
                     </div>
 
                     <div class="flex gap-3">
-                        <input id="admin-search-input" type="text" placeholder="ค้นหาตามรหัส หรือ ชื่อ"
-                            maxlength="100"
+                        <input id="admin-search-input" type="text" placeholder="ค้นหาตามรหัส หรือ ชื่อ" maxlength="100"
                             class="w-full p-2 border rounded" />
                         <button id="admin-search-btn" class="search-button px-4"
                             onclick="adminFilterTable()">ค้นหา</button>
@@ -3330,10 +3335,10 @@
         const DROPDOWN_RETRY_DELAY_MS = 100;         // Delay between retry attempts
         const DROPDOWN_RETRY_TOTAL_DELAY_MS = 200;   // Total delay for full retry sequence
         const DOM_READY_DELAY_MS = 100;              // Delay for DOM to be fully ready
-        
+
         // Partial matching constants
         const MIN_NAME_LENGTH_FOR_PARTIAL_MATCH = 6; // Minimum chars in normalized name to attempt partial matching
-                                                      // Prevents matching generic prefixes like "ตัวแทน"
+        // Prevents matching generic prefixes like "ตัวแทน"
 
         /**
          * Normalize longName for backward compatibility
@@ -3342,15 +3347,15 @@
          */
         function normalizeLongName(longName) {
             if (!longName) return longName;
-            
+
             let normalized = longName;
-            
+
             // If it starts with "ล้ง", replace with "ตัวแทน"
             if (normalized.startsWith('ล้ง')) {
                 normalized = normalized.replace(/^ล้ง/, 'ตัวแทน');
                 console.log(`🔄 Normalized (ล้ง→ตัวแทน): "${longName}" → "${normalized}"`);
             }
-            
+
             // Remove all "พี่" characters from the name
             // This handles cases like "ตัวแทนพี่บาสBDS" → "ตัวแทนบาสBDS"
             // and "ตัวแทนพี่เตยพี่เกรซ" → "ตัวแทนเตยเกรซ"
@@ -3359,11 +3364,12 @@
                 normalized = normalized.replace(/พี่/g, '');
                 console.log(`🔄 Normalized (removed พี่): "${beforeRemoval}" → "${normalized}"`);
             }
-            
+
             return normalized;
         }
 
-        if (isGitHubPages && typeof google === 'undefined') {
+        // Check if running externally (GitHub Pages, Localhost, etc.) where google.script.run is missing
+        if (typeof google === 'undefined') {
             // Create mock google.script.run for GitHub Pages
             window.google = {
                 script: {
@@ -3544,7 +3550,7 @@
                     console.log('❌ No user logged in or no longName');
                 }
             }
-            
+
             // For sheet-b-use-view, optionally auto-select if user is logged in, but don't require it
             if (viewId === 'sheet-b-use-view') {
                 const currentUser = checkLoginStatus();
@@ -3639,7 +3645,7 @@
 
         function populateLongOptions() {
             console.log('🔄 populateLongOptions: Starting dropdown population...');
-            
+
             const selectA = document.getElementById('a-long-affiliation');
             const selectB = document.getElementById('b-long-affiliation');
             const selectBUse = document.getElementById('b-long-affiliation-use');
@@ -3663,7 +3669,7 @@
             selectElements.forEach(selectEl => {
                 try {
                     const elementId = selectEl.id;
-                    
+
                     // Clear existing options
                     while (selectEl.options.length > 0) {
                         selectEl.remove(0);
@@ -3682,14 +3688,14 @@
                         selectEl.options[0].disabled = true;
                         selectEl.options[0].selected = true;
                     }
-                    
+
                     successCount++;
                     console.log(`✅ populateLongOptions: Populated ${elementId} with ${selectEl.options.length} options`);
                 } catch (e) {
                     console.error(`❌ populateLongOptions: Failed to populate ${selectEl.id}:`, e);
                 }
             });
-            
+
             console.log(`📊 populateLongOptions: ${successCount}/${selectElements.length} dropdowns populated successfully`);
             return successCount === selectElements.length;
         }
@@ -4072,7 +4078,7 @@
             // Normalize longName for backward compatibility
             const normalizedLongName = normalizeLongName(currentUser.longName);
             console.log(`🔍 updateSheetALongDropdown: Looking for "${normalizedLongName}"`);
-            
+
             let found = false;
             for (let i = 0; i < longSelect.options.length; i++) {
                 if (longSelect.options[i].value === normalizedLongName) {
@@ -4081,7 +4087,7 @@
                     longSelect.classList.add('bg-gray-100', 'cursor-not-allowed');
                     found = true;
                     console.log(`✅ updateSheetALongDropdown: Auto-selected at index ${i}`);
-                    
+
                     // Trigger change event
                     try {
                         const event = new Event('change', { bubbles: true });
@@ -4617,6 +4623,7 @@
 
                 console.log('📦 ข้อมูลที่จะบันทึก Sheet B:', formData);
 
+                const token = sessionStorage.getItem('sessionToken');
                 google.script.run
                     .withSuccessHandler((result) => {
                         if (submitButton) {
@@ -4649,7 +4656,7 @@
                         );
                         console.error('❌ ข้อผิดพลาดในการบันทึก:', error);
                     })
-                    .writeSheetB(formData);
+                    .writeSheetB(formData, token);
 
             } catch (error) {
                 if (submitButton) {
@@ -4859,7 +4866,7 @@
 
                 if (response && response.success) {
                     console.log('✅ Login successful:', response);
-                    
+
                     // Store session data
                     sessionStorage.setItem('sessionToken', response.token);
                     sessionStorage.setItem('longName', response.longName);
@@ -4874,10 +4881,10 @@
                     } else {
                         // CRITICAL FIX: Ensure dropdowns are populated BEFORE auto-selecting
                         console.log('🔄 Populating dropdowns before auto-select...');
-                        
+
                         // Force populate all dropdowns
                         const populated = populateLongOptions();
-                        
+
                         if (!populated) {
                             console.warn('⚠️ Dropdown population failed, retrying...');
                             // Single setTimeout with total delay for retry
@@ -4892,7 +4899,7 @@
                                 updateAllLongDropdowns(response.longName);
                             }, DROPDOWN_SELECT_DELAY_MS);
                         }
-                        
+
                         showView('submenu-view');
                     }
 
@@ -4940,25 +4947,25 @@
         // =============================================
         // ADMIN LOGIN FUNCTIONS (INDEPENDENT)
         // =============================================
-        
+
         // Helper function to show admin view after successful login
         function showAdminView() {
             const warning = document.getElementById('admin-access-warning');
             const controls = document.getElementById('admin-controls');
             const currentUserEl = document.getElementById('admin-current-user');
-            
+
             if (warning) warning.classList.add('hidden');
             if (controls) controls.classList.remove('hidden');
-            
+
             const username = sessionStorage.getItem('username') || '';
             const longName = sessionStorage.getItem('longName') || '';
             if (currentUserEl) {
                 currentUserEl.textContent = username ? `${username} (${longName || '-'})` : 'ไม่ได้ล็อกอิน';
             }
-            
+
             if (typeof navigateTo === 'function') navigateTo('admin-view');
         }
-        
+
         async function handleAdminLogin(event) {
             event.preventDefault();
 
@@ -5060,16 +5067,16 @@
                         submitButton.innerHTML = 'เข้าสู่ระบบ';
                         return;
                     }
-                    
+
                     // Validate response data before storing
                     if (!response.token || typeof response.token !== 'string' || response.token.length === 0) {
                         throw new Error('Invalid token received from server');
                     }
-                    
+
                     if (!response.username || typeof response.username !== 'string' || response.username.length === 0) {
                         throw new Error('Invalid username received from server');
                     }
-                    
+
                     // Store admin session data
                     // Note: longName is optional - backend may return empty string or undefined
                     sessionStorage.setItem('sessionToken', response.token);
@@ -5168,17 +5175,17 @@
             if (currentUser) {
                 console.log(`✅ User authenticated: ${currentUser.longName}`);
                 showView('submenu-view');
-                
+
                 // CRITICAL FIX: Ensure dropdowns are populated before auto-selecting
                 console.log('🔄 Ensuring dropdowns are populated...');
                 populateLongOptions();
-                
+
                 // Small delay to ensure DOM rendering, then auto-select
                 setTimeout(() => {
                     console.log('🔄 Auto-selecting dropdowns...');
                     updateAllLongDropdowns(currentUser.longName);
                 }, DROPDOWN_SELECT_DELAY_MS);
-                
+
                 const header = document.querySelector('#submenu-view header');
                 if (header) {
                     // ensure we don't append duplicates
@@ -5356,16 +5363,16 @@
         // =============================================
         function updateAllLongDropdowns(selectedLong) {
             console.log('🔄 updateAllLongDropdowns called with:', selectedLong);
-            
+
             if (!selectedLong) {
                 console.warn('⚠️ updateAllLongDropdowns called with empty selectedLong');
                 return;
             }
-            
+
             // Normalize the selectedLong for backward compatibility
             const normalizedLong = normalizeLongName(selectedLong);
             console.log('🔄 Normalized long name:', normalizedLong);
-            
+
             const longSelectors = [
                 'a-long-affiliation',
                 'b-long-affiliation',
@@ -5386,19 +5393,19 @@
                 // CRITICAL FIX: Ensure dropdown is populated before attempting auto-select
                 if (element.options.length === 0 || element.options.length === 1) {
                     console.log(`  ⚠️ Dropdown ${selector} is empty or has only placeholder, populating...`);
-                    
+
                     // Clear existing options
                     while (element.options.length > 0) {
                         element.remove(0);
                     }
-                    
+
                     // Populate with LONG_OPTIONS (always defined as const, no typeof check needed)
                     if (!Array.isArray(LONG_OPTIONS) || LONG_OPTIONS.length === 0) {
                         console.error(`  ❌ LONG_OPTIONS is empty for ${selector}`);
                         failureCount++;
                         return;
                     }
-                    
+
                     LONG_OPTIONS.forEach(option => {
                         const opt = document.createElement('option');
                         opt.value = option.value;
@@ -5408,12 +5415,12 @@
                         }
                         element.appendChild(opt);
                     });
-                    
+
                     console.log(`  ✅ Populated ${selector} with ${element.options.length} options`);
                 }
-                
+
                 console.log(`  🔍 Checking dropdown: ${selector}, options count: ${element.options.length}`);
-                
+
                 // Try to find and select the matching option (exact match first)
                 let found = false;
                 for (let i = 0; i < element.options.length; i++) {
@@ -5422,7 +5429,7 @@
                         element.selectedIndex = i;
                         found = true;
                         console.log(`  ✅ AUTO-SELECTED at index ${i} for ${selector}: "${optionValue}"`);
-                        
+
                         // Trigger change event to ensure any listeners are notified
                         try {
                             const event = new Event('change', { bubbles: true });
@@ -5430,40 +5437,40 @@
                         } catch (e) {
                             console.warn('  ⚠️ Could not dispatch change event:', e);
                         }
-                        
+
                         successCount++;
                         break;
                     }
                 }
-                
+
                 // Improved fallback: Partial matching with safeguards against false positives
                 // Only use partial match if the normalized name is specific enough (longer than generic prefix)
                 if (!found && normalizedLong.length > MIN_NAME_LENGTH_FOR_PARTIAL_MATCH) {
                     console.warn(`  ⚠️ NO EXACT MATCH for "${normalizedLong}" in ${selector}, trying partial...`);
-                    
+
                     for (let i = 0; i < element.options.length; i++) {
                         const optionValue = element.options[i].value;
                         // Skip empty values
                         if (!optionValue || optionValue === "") continue;
-                        
+
                         // One-way matching: check if option contains normalized
                         // This avoids false positives from generic prefixes like "ตัวแทน"
                         if (optionValue.includes(normalizedLong)) {
                             console.log(`  🔧 Found partial match at index ${i}: "${optionValue}"`);
                             element.selectedIndex = i;
-                            
+
                             try {
                                 const event = new Event('change', { bubbles: true });
                                 element.dispatchEvent(event);
-                            } catch (e) {}
-                            
+                            } catch (e) { }
+
                             successCount++;
                             found = true;
                             break;
                         }
                     }
                 }
-                
+
                 if (!found) {
                     console.warn(`  ❌ NO MATCH found (exact or partial) for "${normalizedLong}" in ${selector}`);
                     console.warn(`  Available options:`, Array.from(element.options).map(o => `"${o.value}"`));
@@ -5474,12 +5481,12 @@
                 element.disabled = true;
                 element.classList.add('bg-gray-100', 'cursor-not-allowed');
             });
-            
+
             updateLongDropdownLabels(true);
-            
+
             // Summary log
             console.log(`📊 Dropdown update summary: ${successCount} succeeded, ${failureCount} failed`);
-            
+
             // Show user feedback if there were failures
             if (failureCount > 0 && successCount === 0) {
                 console.error('❌ All dropdown updates failed! User data may not match available options.');
@@ -6988,37 +6995,37 @@
                 LOGIN_ATTEMPT_WINDOW_MS: 300000, // 5 minutes
                 DEBUG_FETCH_TIMEOUT_MS: 30000 // 30 seconds timeout for debug operations
             };
-            
+
             // state
             let lastFetchedData = [];
             let currentDisplayKeys = []; // keep keys order used to render the table (for CSV export)
             let isTableExpanded = false;
             let isFetching = false;
-            
+
             // Rate limiting state for admin login
             let adminLoginAttempts = [];
-            
+
             // Rate limiting helper
             function checkAdminLoginRateLimit() {
                 const now = Date.now();
                 // Remove attempts older than the window
-                adminLoginAttempts = adminLoginAttempts.filter(timestamp => 
+                adminLoginAttempts = adminLoginAttempts.filter(timestamp =>
                     now - timestamp < CONFIG.LOGIN_ATTEMPT_WINDOW_MS
                 );
-                
+
                 if (adminLoginAttempts.length >= CONFIG.MAX_LOGIN_ATTEMPTS) {
                     // Use reduce for safety with large arrays (avoid spread operator stack overflow)
-                    const oldestAttempt = adminLoginAttempts.reduce((min, current) => 
+                    const oldestAttempt = adminLoginAttempts.reduce((min, current) =>
                         Math.min(min, current), Number.MAX_SAFE_INTEGER
                     );
                     const waitTime = Math.ceil((CONFIG.LOGIN_ATTEMPT_WINDOW_MS - (now - oldestAttempt)) / 1000 / 60);
                     return { allowed: false, waitMinutes: waitTime };
                 }
-                
+
                 adminLoginAttempts.push(now);
                 return { allowed: true };
             }
-            
+
             // Expose rate limit check to handleAdminLogin
             window._adminRateLimitCheck = checkAdminLoginRateLimit;
 
@@ -7329,13 +7336,13 @@
                             // Replace CRLF/CR with LF to avoid CSV injection problems (but keep newlines)
                             s = s.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
                             s = s.replace(/"/g, '""');
-                            
+
                             // CSV Injection Prevention: If cell starts with formula characters, prepend single quote
                             // Hyphen placed at end of character class to avoid escaping issues
                             if (s.length > 0 && /^[=+@\t\r\-]/.test(s)) {
                                 s = "'" + s;
                             }
-                            
+
                             return `"${s}"`;
                         }).join(',');
                         rows.push(row);
@@ -7367,7 +7374,7 @@
                 if (searchDebounceTimer) {
                     clearTimeout(searchDebounceTimer);
                 }
-                
+
                 // Debounce search using config constant
                 searchDebounceTimer = setTimeout(() => {
                     try {
@@ -7376,14 +7383,14 @@
                             displayTable(lastFetchedData);
                             return;
                         }
-                        
+
                         // Validate search query length using config constant
                         if (q.length > CONFIG.MAX_SEARCH_QUERY_LENGTH) {
                             console.warn('Search query too long, truncating');
                             document.getElementById('admin-search-input').value = q.substring(0, CONFIG.MAX_SEARCH_QUERY_LENGTH);
                             return;
                         }
-                        
+
                         const filtered = lastFetchedData.filter(row => {
                             try {
                                 return Object.values(row).some(v => {
@@ -7420,7 +7427,7 @@
             function createDebugInfoTemplate(resultDisplay) {
                 return `<pre style="white-space:pre-wrap; max-height:400px; overflow-y:auto; font-family:monospace; font-size:12px;">${resultDisplay}</pre>`;
             }
-            
+
             /**
              * Creates HTML template for displaying debug error messages.
              * @param {string} contextDisplay - Pre-escaped context description
@@ -7443,7 +7450,7 @@
                     </p>
                 </div>`;
             }
-            
+
             /**
              * Creates HTML template for displaying debug exceptions.
              * @param {string} errorMsg - Pre-escaped error message
@@ -7456,7 +7463,7 @@
                     <pre style="background:#f5f5f5; padding:10px; margin-top:10px; border-radius:4px; overflow-x:auto;">${errorMsg}</pre>
                 </div>`;
             }
-            
+
             // Debug helper to fetch and display admin debug info
             function fetchAndShowAdminDebug(token, context) {
                 if (!token) {
@@ -7466,10 +7473,10 @@
                     }
                     return;
                 }
-                
+
                 try {
                     console.log('fetchAndShowAdminDebug called with context:', context);
-                    
+
                     // Check if Google Apps Script API is available
                     if (typeof google === 'undefined' || !google.script || !google.script.run) {
                         console.error('fetchAndShowAdminDebug: google.script.run not available');
@@ -7478,10 +7485,10 @@
                         }
                         return;
                     }
-                    
+
                     // Track completion state to prevent race conditions
                     let operationCompleted = false;
-                    
+
                     // Set timeout for debug operation using CONFIG constant
                     // Set before enabling loading state to ensure proper order
                     const debugTimeout = setTimeout(() => {
@@ -7496,11 +7503,11 @@
                             }
                         }
                     }, CONFIG.DEBUG_FETCH_TIMEOUT_MS);
-                    
+
                     // Set loading state after timeout is configured
                     setAdminControlsDisabled(true);
                     showLoading(true);
-                    
+
                     google.script.run
                         .withSuccessHandler(result => {
                             // Mark operation as completed and cleanup
@@ -7509,9 +7516,9 @@
                                 clearTimeout(debugTimeout);
                                 setAdminControlsDisabled(false);
                                 showLoading(false);
-                                
+
                                 console.log('Debug info fetched successfully:', result);
-                                
+
                                 // Display debug information
                                 if (typeof showMessageBox === 'function') {
                                     const contextDisplay = escapeHtml(context || 'Debug Info');
@@ -7534,9 +7541,9 @@
                                 clearTimeout(debugTimeout);
                                 setAdminControlsDisabled(false);
                                 showLoading(false);
-                                
+
                                 console.error('fetchAndShowAdminDebug failed:', err);
-                                
+
                                 // Display detailed error information
                                 const errorMsg = (err && err.message) ? err.message : 'Unknown error';
                                 if (typeof showMessageBox === 'function') {
@@ -7550,13 +7557,13 @@
                             }
                         })
                         .getAllFarmersDebug(token);
-                        
+
                 } catch (e) {
                     // Handle synchronous exceptions
                     console.error('fetchAndShowAdminDebug exception:', e);
                     setAdminControlsDisabled(false);
                     showLoading(false);
-                    
+
                     // Use safe error message to avoid exposing internal error objects
                     const errorMsg = (e && e.message) ? e.message : 'An unexpected error occurred';
                     if (typeof showMessageBox === 'function') {
@@ -7568,7 +7575,7 @@
                     }
                 }
             };
-            
+
 
             window.adminFetchAllFarmers = function () {
                 if (!isAdminSession()) {
@@ -7648,7 +7655,7 @@
                     if (typeof showMessageBox === 'function') showMessageBox('❌ ไม่รองรับ', 'เกิดข้อผิดพลาด: ' + escapeHtml(e.message || String(e)));
                 }
             };
-            
+
             window.adminFetchAllUsage = function () {
                 if (!isAdminSession()) {
                     if (typeof showMessageBox === 'function') showMessageBox('❌ สิทธิ์ไม่เพียงพอ', 'คุณไม่มีสิทธิ์เข้าถึงข้อมูลนี้');
@@ -7897,15 +7904,15 @@
         window.onload = () => {
             try {
                 console.log('🚀 Starting system initialization...');
-                
+
                 // Step 1: Populate all dropdowns first
                 console.log('Step 1: Populating dropdowns...');
                 const populateSuccess = populateLongOptions();
-                
+
                 if (!populateSuccess) {
                     console.warn('⚠️ Initial dropdown population had issues, will retry on user interaction');
                 }
-                
+
                 // Step 2: Initialize other components
                 console.log('Step 2: Initializing components...');
                 showView('main-menu-view');
@@ -7914,10 +7921,10 @@
                 // Step 3: Check if user already logged in
                 console.log('Step 3: Checking login status...');
                 const currentUser = checkLoginStatus();
-                
+
                 if (currentUser) {
                     console.log('✅ User already logged in:', currentUser.longName);
-                    
+
                     // Give dropdowns a moment to render, then auto-select
                     setTimeout(() => {
                         console.log('🔄 Auto-selecting dropdowns for logged-in user...');
