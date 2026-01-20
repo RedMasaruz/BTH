@@ -505,8 +505,10 @@ function getLongNameFromUsers(username) {
 
 /* ========== ADMIN USER HELPERS ========== */
 /**
- * Check if the given username is listed in the UserAdmin sheet.
- * If password provided, optionally verify password too.
+ * Check if the given username is listed in the UserAdmin sheet or has admin role in Users sheet.
+ * @param {string} username - The username to check
+ * @param {string} [password] - Optional password to verify (currently unused, reserved for future use)
+ * @returns {boolean} True if user has admin privileges
  */
 function isAdminUsername(username, password) {
   console.log('=== isAdminUsername DEBUG ===');
@@ -1541,11 +1543,24 @@ function getAllFarmers(token) {
     
     const session = validateSessionToken(token);
     if (!session) return { success: false, message: 'Unauthorized' };
-    if (!isAdminUsername(session.username)) return { success: false, message: 'Forbidden: not admin' };
+    
+    // Validate token freshness (re-check in case of replay attacks)
+    const tokenAge = Date.now() - (session.timestamp || 0);
+    if (tokenAge > TOKEN_EXPIRY_MS) {
+      return { success: false, message: 'Token expired' };
+    }
+    
+    if (!isAdminUsername(session.username)) {
+      logAction('admin_access_denied', session.username, { function: 'getAllFarmers', reason: 'not_admin' });
+      return { success: false, message: 'Forbidden: not admin' };
+    }
 
     const ss = SpreadsheetApp.openById(SPREADSHEET_ID_A);
     const sheet = ss.getSheetByName(SHEET_A_NAME);
-    if (!sheet || sheet.getLastRow() <= 1) return { success: true, message: 'ไม่มีข้อมูล', data: [] };
+    if (!sheet || sheet.getLastRow() <= 1) {
+      logAction('admin_get_all_farmers', session.username, { result: 'empty', rows: 0 });
+      return { success: true, message: 'ไม่มีข้อมูล', data: [] };
+    }
 
     const data = sheet.getDataRange().getValues();
     const headers = data[0];
@@ -1577,10 +1592,12 @@ function getAllFarmers(token) {
     }
     
     console.log('getAllFarmers returning', out.length, 'records');
+    logAction('admin_get_all_farmers', session.username, { result: 'success', rows: out.length });
     return { success: true, message: `พบ ${out.length} รายการ`, data: out };
     
   } catch (e) {
     console.error('getAllFarmers error:', e);
+    logAction('admin_get_all_farmers', session && session.username, { result: 'error', error: e.message });
     return { success: false, message: 'เกิดข้อผิดพลาด: ' + e.message };
   }
 }
@@ -1593,6 +1610,13 @@ function getAllUsage(token) {
   try {
     const session = validateSessionToken(token);
     if (!session) return { success: false, message: 'Unauthorized' };
+    
+    // Validate token freshness (re-check in case of replay attacks)
+    const tokenAge = Date.now() - (session.timestamp || 0);
+    if (tokenAge > TOKEN_EXPIRY_MS) {
+      return { success: false, message: 'Token expired' };
+    }
+    
     if (!isAdminUsername(session.username)) return { success: false, message: 'Forbidden: not admin' };
 
     const ss = SpreadsheetApp.openById(SPREADSHEET_ID_B);
@@ -1641,6 +1665,13 @@ function getAllMerged(token) {
   try {
     const session = validateSessionToken(token);
     if (!session) return { success: false, message: 'Unauthorized' };
+    
+    // Validate token freshness (re-check in case of replay attacks)
+    const tokenAge = Date.now() - (session.timestamp || 0);
+    if (tokenAge > TOKEN_EXPIRY_MS) {
+      return { success: false, message: 'Token expired' };
+    }
+    
     if (!isAdminUsername(session.username)) return { success: false, message: 'Forbidden: not admin' };
 
     // Get farmers data (แปลง Date แล้ว)
@@ -1980,6 +2011,13 @@ function getAllFarmersDebug(token) {
   try {
     const session = validateSessionToken(token);
     if (!session) return { success: false, message: 'Unauthorized (debug)' };
+    
+    // Validate token freshness
+    const tokenAge = Date.now() - (session.timestamp || 0);
+    if (tokenAge > TOKEN_EXPIRY_MS) {
+      return { success: false, message: 'Token expired (debug)' };
+    }
+    
     if (!isAdminUsername(session.username)) return { success: false, message: 'Forbidden: not admin (debug)' };
 
     const ss = SpreadsheetApp.openById(SPREADSHEET_ID_A);
