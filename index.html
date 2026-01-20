@@ -5265,7 +5265,20 @@
                     try {
                         const data = safeParseJSON(result);
 
-                        if (data && data.success && Array.isArray(data.data) && data.data.length > 0) {
+                        if (!data) {
+                            showMessageBox("❌ ข้อผิดพลาด", "ไม่ได้รับข้อมูลจากเซิร์ฟเวอร์");
+                            return;
+                        }
+
+                        if (data.success === false) {
+                            // Show server error (e.g., Unauthorized)
+                            console.error('Server error:', data.message);
+                            showMessageBox("❌ ไม่สามารถดึงข้อมูลได้", data.message || "เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ");
+                            showEmptySummary(selectedLong); // Also clear the table
+                            return;
+                        }
+
+                        if (Array.isArray(data.data) && data.data.length > 0) {
                             displaySummaryData(data.data, selectedLong);
                         } else {
                             showEmptySummary(selectedLong);
