@@ -5280,7 +5280,7 @@
                     console.error('❌ ข้อผิดพลาดในการดึงข้อมูลสรุป:', error);
                     showMessageBox("❌ ข้อผิดพลาด!", (error && error.message) || 'ไม่สามารถดึงข้อมูลได้');
                 })
-                .getAllFarmersByLong(selectedLong);
+                .getAllFarmersByLong(selectedLong, currentUser.token);
         }
 
         function displaySummaryData(farmers, selectedLong) {
