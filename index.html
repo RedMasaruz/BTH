@@ -7413,16 +7413,12 @@
 
             /**
              * Creates HTML template for displaying debug information.
-             * @param {string} contextDisplay - Pre-escaped context description
              * @param {string} resultDisplay - Pre-escaped JSON result string
              * @returns {string} HTML template string
-             * @security Both parameters MUST be HTML-escaped before calling this function
+             * @security Parameter MUST be HTML-escaped before calling this function
              */
-            function createDebugInfoTemplate(contextDisplay, resultDisplay) {
-                // Both inputs must already be escaped
-                return '<pre style="white-space:pre-wrap; max-height:400px; overflow-y:auto; font-family:monospace; font-size:12px;">' + 
-                       resultDisplay + 
-                       '</pre>';
+            function createDebugInfoTemplate(resultDisplay) {
+                return `<pre style="white-space:pre-wrap; max-height:400px; overflow-y:auto; font-family:monospace; font-size:12px;">${resultDisplay}</pre>`;
             }
             
             /**
@@ -7433,20 +7429,19 @@
              * @security Both parameters MUST be HTML-escaped before calling this function
              */
             function createDebugErrorTemplate(contextDisplay, errorMsg) {
-                // Both inputs must already be escaped
-                return '<div>' +
-                       '<p><strong>Context:</strong> ' + contextDisplay + '</p>' +
-                       '<p><strong>Error:</strong> ' + errorMsg + '</p>' +
-                       '<p style="margin-top:10px; font-size:0.9em; color:#666;">' +
-                       'This debug operation failed. Please check:' +
-                       '<ul style="margin:5px 0; padding-left:20px;">' +
-                       '<li>Your authentication token is valid</li>' +
-                       '<li>You have admin permissions</li>' +
-                       '<li>The backend function getAllFarmersDebug exists</li>' +
-                       '<li>The spreadsheet is accessible</li>' +
-                       '</ul>' +
-                       '</p>' +
-                       '</div>';
+                return `<div>
+                    <p><strong>Context:</strong> ${contextDisplay}</p>
+                    <p><strong>Error:</strong> ${errorMsg}</p>
+                    <p style="margin-top:10px; font-size:0.9em; color:#666;">
+                        This debug operation failed. Please check:
+                        <ul style="margin:5px 0; padding-left:20px;">
+                            <li>Your authentication token is valid</li>
+                            <li>You have admin permissions</li>
+                            <li>The backend function getAllFarmersDebug exists</li>
+                            <li>The spreadsheet is accessible</li>
+                        </ul>
+                    </p>
+                </div>`;
             }
             
             /**
@@ -7456,13 +7451,10 @@
              * @security Parameter MUST be HTML-escaped before calling this function
              */
             function createDebugExceptionTemplate(errorMsg) {
-                // Input must already be escaped
-                return '<div>' +
-                       '<p>An unexpected error occurred while initiating debug operation:</p>' +
-                       '<pre style="background:#f5f5f5; padding:10px; margin-top:10px; border-radius:4px; overflow-x:auto;">' + 
-                       errorMsg + 
-                       '</pre>' +
-                       '</div>';
+                return `<div>
+                    <p>An unexpected error occurred while initiating debug operation:</p>
+                    <pre style="background:#f5f5f5; padding:10px; margin-top:10px; border-radius:4px; overflow-x:auto;">${errorMsg}</pre>
+                </div>`;
             }
             
             // Debug helper to fetch and display admin debug info
@@ -7513,7 +7505,7 @@
                             if (typeof showMessageBox === 'function') {
                                 const contextDisplay = escapeHtml(context || 'Debug Info');
                                 const resultDisplay = escapeHtml(JSON.stringify(result, null, 2));
-                                const template = createDebugInfoTemplate(contextDisplay, resultDisplay);
+                                const template = createDebugInfoTemplate(resultDisplay);
                                 showMessageBox('🔍 Debug Info - ' + contextDisplay, template);
                             } else {
                                 // Fallback to console if showMessageBox is not available
