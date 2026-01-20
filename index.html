@@ -4963,7 +4963,7 @@
                 currentUserEl.textContent = username ? `${username} (${longName || '-'})` : 'ไม่ได้ล็อกอิน';
             }
 
-            if (typeof navigateTo === 'function') navigateTo('admin-view');
+            // Removed navigateTo('admin-view') to prevent infinite loop with MutationObserver
         }
 
         async function handleAdminLogin(event) {
@@ -5089,6 +5089,7 @@
 
                     // Navigate to admin view using helper function
                     showAdminView();
+                    if (typeof navigateTo === 'function') navigateTo('admin-view');
 
                     showMessageBox("✅ เข้าสู่ระบบผู้ดูแลสำเร็จ", `ยินดีต้อนรับ ${response.username}`);
                 } else {
