@@ -5299,18 +5299,35 @@
             farmers.forEach((farmer, index) => {
                 const row = document.createElement('tr');
                 row.className = index % 2 === 0 ? 'bg-white' : 'bg-stone-50';
+
+                // Map Thai headers from backend to variables
+                // Keys must match exactly with Google Sheet headers in WriteSheetA
+                const id = farmer['รหัสเกษตรกร'] || farmer['a-id'] || '---';
+                const name = farmer['ชื่อ-นามสกุล'] || farmer['a-fullname'] || '---';
+                const phone = farmer['เบอร์โทร'] || farmer['a-phone'] || '---';
+                const size = farmer['ขนาดแปลง'] || farmer['a-plotsize'] || '---';
+                const species = farmer['ชนิดพืช'] || farmer['a-cropspecies'] || '---';
+
+                const dateCollect = farmer['วันที่เกษตรกรรับแร่'] || farmer['a-datecollect'];
+                const sackCollect = farmer['จำนวนกระสอบ'] || farmer['a-sackcollect'];
+
+                const dateNano = farmer['วันที่เกษตรกรรับนาโน'] || farmer['a-datenano'];
+                const nanoAmount = farmer['จำนวนนาโน_ลิตร'] || farmer['a-nanoliters'];
+
+                const preMitra = farmer['ค่าไมทราไจนีน'] || farmer['a-premitra'];
+
                 row.innerHTML = `
-                    <td class="px-4 py-3 font-medium text-stone-800">${farmer['a-id'] || '---'}</td>
-                    <td class="px-4 py-3">${farmer['a-fullname'] || '---'}</td>
-                    <td class="px-4 py-3">${farmer['a-phone'] || '---'}</td>
-                    <td class="px-4 py-3">${farmer['a-plotsize'] ? `${farmer['a-plotsize']} ไร่` : '---'}</td>
-                    <td class="px-4 py-3">${farmer['a-cropspecies'] || '---'}</td>
-                    <td class="px-4 py-3">${formatDateForDisplay(farmer['a-datecollect']) || '---'}</td>
-                    <td class="px-4 py-3">${farmer['a-sackcollect'] ? `${farmer['a-sackcollect']} กระสอบ` : '---'}</td>
-                    <td class="px-4 py-3">${formatDateForDisplay(farmer['a-datenano']) || '---'}</td>
-                    <td class="px-4 py-3">${farmer['a-nanoliters'] ? `${farmer['a-nanoliters']} ลิตร` : '---'}</td>
-                    <td class="px-4 py-3 font-medium ${getMitraColorClass(farmer['a-premitra'])}">
-                        ${farmer['a-premitra'] ? `${parseFloat(farmer['a-premitra']).toFixed(2)}` : '---'}
+                    <td class="px-4 py-3 font-medium text-stone-800">${id}</td>
+                    <td class="px-4 py-3">${name}</td>
+                    <td class="px-4 py-3">${phone}</td>
+                    <td class="px-4 py-3">${size !== '---' ? `${size} ไร่` : '---'}</td>
+                    <td class="px-4 py-3">${species}</td>
+                    <td class="px-4 py-3">${formatDateForDisplay(dateCollect) || '---'}</td>
+                    <td class="px-4 py-3">${sackCollect ? `${sackCollect} กระสอบ` : '---'}</td>
+                    <td class="px-4 py-3">${formatDateForDisplay(dateNano) || '---'}</td>
+                    <td class="px-4 py-3">${nanoAmount ? `${nanoAmount} ลิตร` : '---'}</td>
+                    <td class="px-4 py-3 font-medium ${getMitraColorClass(preMitra)}">
+                        ${preMitra ? `${parseFloat(preMitra).toFixed(2)}` : '---'}
                     </td>
                     <td class="px-4 py-3">
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusClass(farmer)}">
