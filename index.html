@@ -4952,6 +4952,18 @@
         
         // Helper function to show admin view after successful login
         function showAdminView() {
+            // SECURITY FIX: Always verify admin session before showing view
+            // Prevents direct console call bypass
+            if (!isAdminSession()) {
+                console.warn('Unauthorized attempt to access admin view');
+                const warning = document.getElementById('admin-access-warning');
+                const controls = document.getElementById('admin-controls');
+                if (warning) warning.classList.remove('hidden');
+                if (controls) controls.classList.add('hidden');
+                if (typeof showAdminLoginModal === 'function') showAdminLoginModal();
+                return;
+            }
+            
             const warning = document.getElementById('admin-access-warning');
             const controls = document.getElementById('admin-controls');
             const currentUserEl = document.getElementById('admin-current-user');
@@ -7219,12 +7231,56 @@
                 try {
                     const token = sessionStorage.getItem('sessionToken');
                     const username = sessionStorage.getItem('username');
-                    const isAdmin = sessionStorage.getItem('isAdmin'); // expected 'true' or 'false'
+                    const isAdmin = sessionStorage.getItem('isAdmin');
 
-                    // require token and server-provided isAdmin flag
+                    // Check existence
                     if (!token || !username) return false;
-                    if (isAdmin === 'true') return true;
-                    return false;
+                    if (isAdmin !== 'true') return false;
+                    
+                    // SECURITY FIX: Validate token format (base64.base64)
+                    if (typeof token !== 'string') return false;
+                    const parts = token.split('.');
+                    if (parts.length !== 2) {
+                        console.warn('Invalid token format - clearing session');
+                        sessionStorage.clear();
+                        return false;
+                    }
+                    
+                    // SECURITY FIX: Validate token expiry and username (client-side defense-in-depth)
+                    try {
+                        const encodedData = parts[0];
+                        const decodedData = atob(encodedData);
+                        const tokenData = JSON.parse(decodedData);
+                        
+                        if (!tokenData.timestamp) {
+                            console.warn('Token missing timestamp - clearing session');
+                            sessionStorage.clear();
+                            return false;
+                        }
+                        
+                        // Check if token is expired (24 hours = 86400000ms)
+                        const now = Date.now();
+                        const tokenAge = now - tokenData.timestamp;
+                        if (tokenAge > 86400000) {
+                            console.warn('Token expired on client side - clearing session');
+                            sessionStorage.clear();
+                            return false;
+                        }
+                        
+                        // Verify username matches token
+                        if (tokenData.username !== username) {
+                            console.warn('Token username mismatch - clearing session');
+                            sessionStorage.clear();
+                            return false;
+                        }
+                        
+                    } catch (e) {
+                        console.error('Token validation error:', e);
+                        sessionStorage.clear();
+                        return false;
+                    }
+                    
+                    return true;
                 } catch (e) {
                     console.error('admin: isAdminSession error', e);
                     return false;
@@ -7247,24 +7303,111 @@
                 }
             };
 
+            // Race condition prevention flag
+            let isAdminInitializing = false;
+
             window.adminCheckAuthAndInit = function () {
-                const currentUserEl = document.getElementById('admin-current-user');
-                const warning = document.getElementById('admin-access-warning');
-                const controls = document.getElementById('admin-controls');
-
-                const username = sessionStorage.getItem('username') || '';
-                const longName = sessionStorage.getItem('longName') || '';
-                if (currentUserEl) currentUserEl.textContent = username ? `${username} (${longName || '-'})` : 'ไม่ได้ล็อกอิน';
-
-                if (!isAdminSession()) {
-                    if (warning) warning.classList.remove('hidden');
-                    if (controls) controls.classList.add('hidden');
-                    if (typeof showAdminLoginModal === 'function') showAdminLoginModal();
+                // SECURITY FIX: Prevent concurrent calls (race condition)
+                if (isAdminInitializing) {
+                    console.log('Admin init already in progress, skipping');
                     return;
                 }
+                
+                isAdminInitializing = true;
+                const username = sessionStorage.getItem('username') || 'anonymous';
+                
+                try {
+                    const currentUserEl = document.getElementById('admin-current-user');
+                    const warning = document.getElementById('admin-access-warning');
+                    const controls = document.getElementById('admin-controls');
+                    
+                    // SECURITY FIX: Validate critical elements exist
+                    if (!warning || !controls) {
+                        console.error('Critical admin UI elements not found', {
+                            warning: !!warning,
+                            controls: !!controls
+                        });
+                        return;
+                    }
 
-                // Use helper function for consistency
-                showAdminView();
+                    // ALWAYS update display from current sessionStorage (not cached)
+                    const currentUsername = sessionStorage.getItem('username') || '';
+                    const longName = sessionStorage.getItem('longName') || '';
+                    if (currentUserEl) {
+                        currentUserEl.textContent = currentUsername ? `${currentUsername} (${longName || '-'})` : 'ไม่ได้ล็อกอิน';
+                    }
+
+                    if (!isAdminSession()) {
+                        console.warn('Admin access denied:', {
+                            username: username,
+                            hasToken: !!sessionStorage.getItem('sessionToken'),
+                            isAdmin: sessionStorage.getItem('isAdmin'),
+                            timestamp: new Date().toISOString()
+                        });
+                        
+                        if (warning) warning.classList.remove('hidden');
+                        if (controls) controls.classList.add('hidden');
+                        
+                        // SECURITY FIX: Check if modal is already visible
+                        const modal = document.getElementById('admin-login');
+                        if (modal && !modal.classList.contains('hidden')) {
+                            console.log('Admin login modal already visible');
+                            return;
+                        }
+                        
+                        if (typeof showAdminLoginModal === 'function') {
+                            if (modal) {
+                                showAdminLoginModal();
+                            } else {
+                                console.error('Admin login modal not found in DOM');
+                            }
+                        } else {
+                            console.error('showAdminLoginModal function not defined');
+                            if (typeof showMessageBox === 'function') {
+                                showMessageBox('❌ เกิดข้อผิดพลาด', 'ฟังก์ชันเข้าสู่ระบบไม่พร้อมใช้งาน');
+                            }
+                        }
+                        return;
+                    }
+
+                    console.log('Admin access granted:', {
+                        username: username,
+                        timestamp: new Date().toISOString()
+                    });
+                    
+                    // UX: Show brief loading state
+                    const loadingIndicator = document.getElementById('admin-loading');
+                    if (loadingIndicator) loadingIndicator.classList.remove('hidden');
+                    
+                    setTimeout(() => {
+                        if (typeof showAdminView === 'function') {
+                            showAdminView();
+                        } else {
+                            console.error('showAdminView function not defined');
+                            if (typeof navigateTo === 'function') {
+                                navigateTo('admin-view');
+                            }
+                        }
+                        if (loadingIndicator) loadingIndicator.classList.add('hidden');
+                    }, 150);
+                    
+                } catch (error) {
+                    console.error('adminCheckAuthAndInit error:', {
+                        username: username,
+                        error: error.message,
+                        stack: error.stack,
+                        timestamp: new Date().toISOString()
+                    });
+                    
+                    if (typeof showMessageBox === 'function') {
+                        showMessageBox('❌ เกิดข้อผิดพลาด', 'ไม่สามารถเข้าสู่หน้าผู้ดูแลได้ กรุณาลองใหม่อีกครั้ง');
+                    }
+                } finally {
+                    // Reset flag after delay to allow legitimate re-calls
+                    setTimeout(() => {
+                        isAdminInitializing = false;
+                    }, 100);
+                }
             };
 
             function showLoading(show = true) {
@@ -7746,6 +7889,39 @@
                 });
                 mo.observe(adminView, { attributes: true, attributeFilter: ['class'] });
             }
+            
+            // SECURITY FIX: Monitor sessionStorage for clearing/tampering
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'sessionToken' || e.key === 'isAdmin' || e.key === null) {
+                    if (!isAdminSession()) {
+                        console.log('Session cleared, hiding admin controls');
+                        const controls = document.getElementById('admin-controls');
+                        const warning = document.getElementById('admin-access-warning');
+                        if (controls) controls.classList.add('hidden');
+                        if (warning) warning.classList.remove('hidden');
+                        
+                        const adminView = document.getElementById('admin-view');
+                        if (adminView && !adminView.classList.contains('hidden')) {
+                            if (typeof navigateTo === 'function') navigateTo('main-menu-view');
+                        }
+                    }
+                }
+            });
+            
+            // SECURITY FIX: Periodic session validation (every 60 seconds)
+            setInterval(() => {
+                const adminView = document.getElementById('admin-view');
+                if (adminView && !adminView.classList.contains('hidden')) {
+                    if (!isAdminSession()) {
+                        console.warn('Session lost while on admin view, redirecting');
+                        if (typeof adminForceLogout === 'function') {
+                            adminForceLogout();
+                        } else if (typeof navigateTo === 'function') {
+                            navigateTo('main-menu-view');
+                        }
+                    }
+                }
+            }, 60000);
         })();
 
         // =============================================
