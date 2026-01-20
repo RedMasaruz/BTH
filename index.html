@@ -3346,18 +3346,29 @@
         /**
          * Normalize longName for backward compatibility
          * Converts "ล้ง" prefix to "ตัวแทน" prefix
+         * Removes all "พี่" characters from the name
          */
         function normalizeLongName(longName) {
             if (!longName) return longName;
             
+            let normalized = longName;
+            
             // If it starts with "ล้ง", replace with "ตัวแทน"
-            if (longName.startsWith('ล้ง')) {
-                const normalized = longName.replace(/^ล้ง/, 'ตัวแทน');
-                console.log(`🔄 Normalized "${longName}" → "${normalized}"`);
-                return normalized;
+            if (normalized.startsWith('ล้ง')) {
+                normalized = normalized.replace(/^ล้ง/, 'ตัวแทน');
+                console.log(`🔄 Normalized (ล้ง→ตัวแทน): "${longName}" → "${normalized}"`);
             }
             
-            return longName;
+            // Remove all "พี่" characters from the name
+            // This handles cases like "ตัวแทนพี่บาสBDS" → "ตัวแทนบาสBDS"
+            // and "ตัวแทนพี่เตยพี่เกรซ" → "ตัวแทนเตยเกรซ"
+            if (normalized.includes('พี่')) {
+                const beforeRemoval = normalized;
+                normalized = normalized.replace(/พี่/g, '');
+                console.log(`🔄 Normalized (removed พี่): "${beforeRemoval}" → "${normalized}"`);
+            }
+            
+            return normalized;
         }
 
         if (isGitHubPages && typeof google === 'undefined') {
