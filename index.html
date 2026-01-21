@@ -5,10 +5,10 @@
     <meta charset="UTF-8">
     <!-- Updated viewport to include safe-area for iOS devices -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Traceability - BTH</title>
+    <title>ระบบบันทึกและติดตามเกษตรกร</title>
 
     <!-- PWA Meta Tags -->
-    <meta name="description" content="Traceability - บริษัท บ้านไทยเฮิร์บเซ็นเตอร์ จำกัด">
+    <meta name="description" content="ระบบบันทึกและติดตามข้อมูลเกษตรกร - บริษัท บ้านไทยเฮิร์บเซ็นเตอร์ จำกัด">
     <meta name="theme-color" content="#16a34a">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1734,8 +1734,8 @@
                                             <!-- ระบบให้น้ำ -->
                                             <div>
                                                 <label class="form-label block font-medium mb-1 text-stone-800">
-                                                    ระบบให้น้ำ <small
-                                                        class="text-gray-500">(เลือกได้มากกว่าหนึ่ง)</small>
+                                                    ระบบให้น้ำ <small class="text-gray-500">(เลือกได้มากกว่าหนึ่ง)<span
+                                                            class="text-red-600">*</span></small>
                                                 </label>
                                                 <div class="flex flex-col gap-2">
                                                     <div class="flex items-center">
@@ -1790,14 +1790,14 @@
                                                     น้ำ</label>
                                                 <input type="text"
                                                     class="w-full px-3 py-2 border border-gray-300 rounded text-sm md:text-base"
-                                                    id="water_ph" name="water_ph" placeholder="ค่า PH น้ำ">
+                                                    id="water_ph" name="water_ph" required placeholder="ค่า PH น้ำ">
                                             </div>
 
                                             <!-- วิธีให้ปุ๋ย -->
                                             <div>
                                                 <label class="form-label block font-medium mb-1 text-stone-800">
-                                                    ระบบให้ปุ๋ย <small
-                                                        class="text-gray-500">(เลือกได้มากกว่าหนึ่ง)</small>
+                                                    ระบบให้ปุ๋ย <small class="text-gray-500">(เลือกได้มากกว่าหนึ่ง)<span
+                                                            class="text-red-600">*</span></small>
                                                 </label>
                                                 <div class="flex flex-col gap-2">
                                                     <div class="flex items-center">
@@ -1846,7 +1846,7 @@
                                                     ดิน</label>
                                                 <input type="text"
                                                     class="w-full px-3 py-2 border border-gray-300 rounded text-sm md:text-base"
-                                                    id="soil_ph" name="soil_ph" placeholder="ค่า PH ดิน">
+                                                    id="soil_ph" name="soil_ph" required placeholder="ค่า PH ดิน">
                                             </div>
 
                                             <!-- ฮอร์โมน / อื่นๆ (รวมแร่ภูเขาไฟ ย้ายมาที่นี่) -->
@@ -1863,7 +1863,7 @@
                                                 </div>
                                                 <label for="hormone_and_other"
                                                     class="form-label block font-medium mb-1 text-stone-800">ฮอร์โมน /
-                                                    อื่นๆ</label>
+                                                    อื่นๆ<span class="text-red-600">*</span></label>
 
                                                 <!-- รวมช่องฮอร์โมนและช่องอื่นๆ เป็นช่องเดียว -->
                                                 <input type="text"
@@ -1885,7 +1885,8 @@
                                             <!-- ฤดูแตัวแทน -->
                                             <div>
                                                 <label
-                                                    class="form-label block font-bold mb-1 text-stone-800">ช่วงฤดูแล้ง</label>
+                                                    class="form-label block font-bold mb-1 text-stone-800">ช่วงฤดูแล้ง<span
+                                                        class="text-red-600">*</span></label>
                                                 <select
                                                     class="w-full px-3 py-2 border border-gray-300 rounded text-sm md:text-base mb-2"
                                                     name="dry_start_month" id="dry_start_month">
@@ -1925,10 +1926,11 @@
                                             <!-- ฤดูฝน -->
                                             <div>
                                                 <label
-                                                    class="form-label block font-bold mb-1 text-stone-800">ช่วงฤดูฝน</label>
+                                                    class="form-label block font-bold mb-1 text-stone-800">ช่วงฤดูฝน<span
+                                                        class="text-red-600">*</span></label>
                                                 <select
                                                     class="w-full px-3 py-2 border border-gray-300 rounded text-sm md:text-base mb-2"
-                                                    name="rainy_start_month" id="rainy_start_month">
+                                                    name="rainy_start_month" required id="rainy_start_month">
                                                     <option value="">เดือนเริ่มต้น</option>
                                                     <option value="1">มกราคม</option>
                                                     <option value="2">กุมภาพันธ์</option>
@@ -1945,7 +1947,7 @@
                                                 </select>
                                                 <select
                                                     class="w-full px-3 py-2 border border-gray-300 rounded text-sm md:text-base"
-                                                    name="rainy_end_month" id="rainy_end_month">
+                                                    name="rainy_end_month" required id="rainy_end_month">
                                                     <option value="">เดือนสิ้นสุด</option>
                                                     <option value="1">มกราคม</option>
                                                     <option value="2">กุมภาพันธ์</option>
@@ -1965,10 +1967,11 @@
                                             <!-- ฤดูหนาว -->
                                             <div>
                                                 <label
-                                                    class="form-label block font-bold mb-1 text-stone-800">ช่วงฤดูหนาว</label>
+                                                    class="form-label block font-bold mb-1 text-stone-800">ช่วงฤดูหนาว<span
+                                                        class="text-red-600">*</span></label>
                                                 <select
                                                     class="w-full px-3 py-2 border border-gray-300 rounded text-sm md:text-base mb-2"
-                                                    name="winter_start_month" id="winter_start_month">
+                                                    name="winter_start_month" required id="winter_start_month">
                                                     <option value="">เดือนเริ่มต้น</option>
                                                     <option value="1">มกราคม</option>
                                                     <option value="2">กุมภาพันธ์</option>
@@ -2024,8 +2027,8 @@
                                                     </div>
                                                     <div id="gap-date-range" class="mt-2 hidden">
                                                         <label
-                                                            class="form-label block text-sm mb-1 text-stone-800">ถ้ามี
-                                                            โปรดระบุ</label>
+                                                            class="form-label block text-sm mb-1 text-stone-800">ถ้ามีโปรดระบุ
+                                                            วันที่เริ่มต้นและวันที่สิ้นสุด</label>
                                                         <div class="grid grid-cols-2 gap-2">
                                                             <div>
                                                                 <input type="date"
@@ -2063,8 +2066,8 @@
                                                     </div>
                                                     <div id="gacp-date-range" class="mt-2 hidden">
                                                         <label
-                                                            class="form-label block text-sm mb-1 text-stone-800">ถ้ามี
-                                                            โปรดระบุ</label>
+                                                            class="form-label block text-sm mb-1 text-stone-800">ถ้ามีโปรดระบุ
+                                                            วันที่เริ่มต้นและวันที่สิ้นสุด</label>
                                                         <div class="grid grid-cols-2 gap-2">
                                                             <div>
                                                                 <input type="date"
@@ -2151,7 +2154,8 @@
                                         <!-- เลือกสายพันธุ์กระท่อม -->
                                         <div class="mb-4">
                                             <label
-                                                class="form-label block font-bold mb-1 text-stone-800">สายพันธุ์กระท่อม</label>
+                                                class="form-label block font-bold mb-1 text-stone-800">สายพันธุ์กระท่อม<span
+                                                    class="text-red-600">*</span></label>
                                             <div class="flex flex-wrap gap-3">
                                                 <div class="flex items-center">
                                                     <input class="mr-2 stem-cb" type="checkbox" value="red"
@@ -2226,7 +2230,8 @@
                                     <div class="form-section border border-gray-200 rounded-lg p-3 md:p-6 mb-4 md:mb-6">
                                         <h3
                                             class="section-title text-lg md:text-xl font-bold text-stone-800 mb-3 md:mb-4">
-                                            <i class="bi bi-list-ol me-2"></i>ข้อมูลพื้นที่ย้อนหลัง 3ปี
+                                            <i class="bi bi-list-ol me-2"></i>ข้อมูลพื้นที่ย้อนหลัง 3ปี<span
+                                                class="text-red-600">*</span>
                                         </h3>
                                         <div class="flex flex-wrap gap-2">
                                             <div class="flex items-center">
@@ -2793,371 +2798,364 @@
                             <input type="text" id="b-fullname-use" placeholder="ชื่อ-สกุลเกษตรกร" required
                                 class="w-full">
                         </div>
+                    </div>
+
+                </div>
+        </div>
+
+        <div class="space-y-4 pt-4 border rounded-lg p-4">
+            <h3 class="text-lg font-semibold text-stone-700">ข้อมูลการใช้</h3>
+
+            <!-- วันที่ใส่ปุ๋ยบำรุงดิน -->
+            <div class="border rounded-lg p-4 bg-green-50">
+                <h4 class="font-semibold text-green-800 mb-3">วันที่ใส่ปุ๋ยบำรุงดิน ทุก 4 วัน / 1-2 ครั้ง /
+                    สัปดาห์</h4>
+                <div id="fertilizer-usage-container">
+                    <div class="fertilizer-usage-item grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
                         <div>
-                            <label for="b-phone-use" class="block text-sm font-medium mb-1">เบอร์โทรศัพท์ *</label>
-                            <input type="tel" id="b-phone-use" placeholder="เบอร์โทรศัพท์" required
-                                pattern="[0-9]{9,15}" class="w-full">
+                            <label class="block text-sm font-medium mb-1">วันที่ใส่ปุ๋ย</label>
+                            <input type="date" class="fertilizer-date w-full">
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium mb-1">บำรุงดินด้วย<span
+                                    class="text-xs text-green-600">(เลือกได้มากกว่าหนึ่ง)</span></label>
+                            <div class="radio-group flex flex-wrap gap-2">
+                                <input type="checkbox" id="b-fert-organic" name="fertilizer-type" value="ปุ๋ยอินทรีย์"
+                                    class="hidden">
+                                <label for="b-fert-organic"
+                                    class="px-3 py-2 rounded-lg cursor-pointer border border-green-300 bg-white hover:bg-green-50">ปุ๋ยอินทรีย์</label>
+
+                                <input type="checkbox" id="b-fert-chemical" name="fertilizer-type" value="ปุ๋ยเคมี"
+                                    class="hidden">
+                                <label for="b-fert-chemical"
+                                    class="px-3 py-2 rounded-lg cursor-pointer border border-green-300 bg-white hover:bg-green-50">ปุ๋ยเคมี</label>
+
+                                <input type="checkbox" id="b-fert-manure" name="fertilizer-type" value="ปุ๋ยคอก"
+                                    class="hidden">
+                                <label for="b-fert-manure"
+                                    class="px-3 py-2 rounded-lg cursor-pointer border border-green-300 bg-white hover:bg-green-50">ปุ๋ยคอก</label>
+
+                                <input type="checkbox" id="b-fert-volcanic" name="fertilizer-type" value="แร่ภูเขาไฟ"
+                                    class="hidden">
+                                <label for="b-fert-volcanic"
+                                    class="px-3 py-2 rounded-lg cursor-pointer border border-green-300 bg-white hover:bg-green-50">แร่ภูเขาไฟ</label>
+
+                                <input type="checkbox" id="b-fert-other" name="fertilizer-type" value="อื่นๆ"
+                                    class="hidden" onchange="toggleOtherFertilizerInputUse(this)">
+                                <label for="b-fert-other"
+                                    class="px-3 py-2 rounded-lg cursor-pointer border border-green-300 bg-white hover:bg-green-50">อื่นๆ
+                                    (ระบุ)</label>
+                            </div>
+                            <input type="text" id="b-fertilizer-other-text-use"
+                                placeholder="โปรดระบุชนิดปุ๋ยอื่นๆ ที่ใช้"
+                                class="hidden mt-2 w-full fertilizer-other-text">
+                        </div>
+
+                        <div class="flex items-end col-span-full">
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="space-y-4 pt-4 border rounded-lg p-4">
-                    <h3 class="text-lg font-semibold text-stone-700">ข้อมูลการใช้</h3>
-
-                    <!-- วันที่ใส่ปุ๋ยบำรุงดิน -->
-                    <div class="border rounded-lg p-4 bg-green-50">
-                        <h4 class="font-semibold text-green-800 mb-3">วันที่ใส่ปุ๋ยบำรุงดิน ทุก 4 วัน / 1-2 ครั้ง /
-                            สัปดาห์</h4>
-                        <div id="fertilizer-usage-container">
-                            <div class="fertilizer-usage-item grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
-                                <div>
-                                    <label class="block text-sm font-medium mb-1">วันที่ใส่ปุ๋ย</label>
-                                    <input type="date" class="fertilizer-date w-full">
-                                </div>
-
-                                <div class="md:col-span-2">
-                                    <label class="block text-sm font-medium mb-1">บำรุงดินด้วย<span
-                                            class="text-xs text-green-600">(เลือกได้มากกว่าหนึ่ง)</span></label>
-                                    <div class="radio-group flex flex-wrap gap-2">
-                                        <input type="checkbox" id="b-fert-organic" name="fertilizer-type"
-                                            value="ปุ๋ยอินทรีย์" class="hidden">
-                                        <label for="b-fert-organic"
-                                            class="px-3 py-2 rounded-lg cursor-pointer border border-green-300 bg-white hover:bg-green-50">ปุ๋ยอินทรีย์</label>
-
-                                        <input type="checkbox" id="b-fert-chemical" name="fertilizer-type"
-                                            value="ปุ๋ยเคมี" class="hidden">
-                                        <label for="b-fert-chemical"
-                                            class="px-3 py-2 rounded-lg cursor-pointer border border-green-300 bg-white hover:bg-green-50">ปุ๋ยเคมี</label>
-
-                                        <input type="checkbox" id="b-fert-manure" name="fertilizer-type" value="ปุ๋ยคอก"
-                                            class="hidden">
-                                        <label for="b-fert-manure"
-                                            class="px-3 py-2 rounded-lg cursor-pointer border border-green-300 bg-white hover:bg-green-50">ปุ๋ยคอก</label>
-
-                                        <input type="checkbox" id="b-fert-volcanic" name="fertilizer-type"
-                                            value="แร่ภูเขาไฟ" class="hidden">
-                                        <label for="b-fert-volcanic"
-                                            class="px-3 py-2 rounded-lg cursor-pointer border border-green-300 bg-white hover:bg-green-50">แร่ภูเขาไฟ</label>
-
-                                        <input type="checkbox" id="b-fert-other" name="fertilizer-type" value="อื่นๆ"
-                                            class="hidden" onchange="toggleOtherFertilizerInputUse(this)">
-                                        <label for="b-fert-other"
-                                            class="px-3 py-2 rounded-lg cursor-pointer border border-green-300 bg-white hover:bg-green-50">อื่นๆ
-                                            (ระบุ)</label>
-                                    </div>
-                                    <input type="text" id="b-fertilizer-other-text-use"
-                                        placeholder="โปรดระบุชนิดปุ๋ยอื่นๆ ที่ใช้"
-                                        class="hidden mt-2 w-full fertilizer-other-text">
-                                </div>
-
-                                <div class="flex items-end col-span-full">
-                                </div>
-                            </div>
+            <!-- วันที่ใช้นาโน -->
+            <div class="border rounded-lg p-4 bg-blue-50">
+                <h4 class="font-semibold text-blue-800 mb-3">วันที่ใช้นาโน ทุก 7 วัน / 4 ครั้ง / เดือน</h4>
+                <div id="nano-usage-container">
+                    <div class="nano-usage-item grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">วันที่ใช้นาโน</label>
+                            <input type="date" class="nano-date w-full">
                         </div>
-                    </div>
-
-                    <!-- วันที่ใช้นาโน -->
-                    <div class="border rounded-lg p-4 bg-blue-50">
-                        <h4 class="font-semibold text-blue-800 mb-3">วันที่ใช้นาโน ทุก 7 วัน / 4 ครั้ง / เดือน</h4>
-                        <div id="nano-usage-container">
-                            <div class="nano-usage-item grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
-                                <div>
-                                    <label class="block text-sm font-medium mb-1">วันที่ใช้นาโน</label>
-                                    <input type="date" class="nano-date w-full">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium mb-1">จำนวนที่ใช้ (ลิตร)</label>
-                                    <input type="number" class="nano-amount w-full" min="0.1" step="0.1">
-                                </div>
-                                <div class="flex items-end">
-                                </div>
-                            </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">จำนวนที่ใช้ (ลิตร)</label>
+                            <input type="number" class="nano-amount w-full" min="0.1" step="0.1">
                         </div>
-                    </div>
-
-                    <!-- วันที่ใช้แร่ -->
-                    <div class="border rounded-lg p-4 bg-orange-50">
-                        <h4 class="font-semibold text-orange-800 mb-3">วันที่ใช้แร่ ทุก 16 วัน / 2 ครั้ง / เดือน</h4>
-                        <div id="mineral-usage-container">
-                            <div class="mineral-usage-item grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
-                                <div>
-                                    <label class="block text-sm font-medium mb-1">วันที่ใช้แร่</label>
-                                    <input type="date" class="mineral-date w-full">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium mb-1">จำนวนที่ใช้ (กิโลกรัม)</label>
-                                    <input type="number" class="mineral-amount w-full" min="0.1" step="0.1">
-                                </div>
-                                <div class="flex items-end">
-                                </div>
-                            </div>
+                        <div class="flex items-end">
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- ค่าสารและอัตราการใช้ -->
-                <div class="space-y-4 pt-4 border rounded-lg p-4">
-                    <h3 class="text-lg font-semibold text-stone-700">อัตราการใช้ </h3>
-
-                    <div>
-                        <label class="block text-sm font-medium mb-1">อัตราการใส่แร่ที่แนะนำ (เช่น 1 กระสอบ / 1 ไร่)
-                            <span class="text-red-500">กรุณาเลือกก่อนบันทึก</span></label>
-                        <div class="radio-group flex items-center flex-wrap gap-2">
-                            <input type="radio" id="b-rate-follow" name="b-rate" value="ปฏิบัติตาม" required
-                                class="hidden" onchange="toggleAdjustedBRate()">
-                            <label for="b-rate-follow" class="px-4 py-2 rounded-lg cursor-pointer">ปฏิบัติตาม</label>
-
-                            <input type="radio" id="b-rate-adjust" name="b-rate" value="ปรับตาม" class="hidden"
-                                onchange="toggleAdjustedBRate()">
-                            <label for="b-rate-adjust" class="px-4 py-2 rounded-lg cursor-pointer">ปรับตาม</label>
-
-                            <input type="number" id="b-rate-adjusted" placeholder="ระบุอัตรา (กระสอบ/ไร่)" min="0.1"
-                                step="0.1" class="hidden ml-4">
+            <!-- วันที่ใช้แร่ -->
+            <div class="border rounded-lg p-4 bg-orange-50">
+                <h4 class="font-semibold text-orange-800 mb-3">วันที่ใช้แร่ ทุก 16 วัน / 2 ครั้ง / เดือน</h4>
+                <div id="mineral-usage-container">
+                    <div class="mineral-usage-item grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">วันที่ใช้แร่</label>
+                            <input type="date" class="mineral-date w-full">
                         </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium mb-1">อัตราการใส่นาโนที่แนะนำ (เช่น 1 ลิตร / 1 ไร่)
-                            <span class="text-red-500">กรุณาเลือกก่อนบันทึก</span></label>
-                        <div class="radio-group flex items-center flex-wrap gap-2">
-                            <input type="radio" id="b-nano-rate-follow" name="b-nano-rate" value="ปฏิบัติตาม" required
-                                class="hidden" onchange="toggleAdjustedBNanoRate()">
-                            <label for="b-nano-rate-follow"
-                                class="px-4 py-2 rounded-lg cursor-pointer">ปฏิบัติตาม</label>
-
-                            <input type="radio" id="b-nano-rate-adjust" name="b-nano-rate" value="ปรับตาม"
-                                class="hidden" onchange="toggleAdjustedBNanoRate()">
-                            <label for="b-nano-rate-adjust" class="px-4 py-2 rounded-lg cursor-pointer">ปรับตาม</label>
-
-                            <input type="number" id="b-nano-rate-adjusted" placeholder="ระบุอัตรา (ลิตร/ไร่)" min="0.1"
-                                step="0.1" class="hidden ml-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">จำนวนที่ใช้ (กิโลกรัม)</label>
+                            <input type="number" class="mineral-amount w-full" min="0.1" step="0.1">
+                        </div>
+                        <div class="flex items-end">
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
 
+        <!-- ค่าสารและอัตราการใช้ -->
+        <div class="space-y-4 pt-4 border rounded-lg p-4">
+            <h3 class="text-lg font-semibold text-stone-700">อัตราการใช้ </h3>
+
+            <div>
+                <label class="block text-sm font-medium mb-1">อัตราการใส่แร่ที่แนะนำ (เช่น 1 กระสอบ / 1 ไร่)
+                    <span class="text-red-500">กรุณาเลือกก่อนบันทึก</span></label>
+                <div class="radio-group flex items-center flex-wrap gap-2">
+                    <input type="radio" id="b-rate-follow" name="b-rate" value="ปฏิบัติตาม" required class="hidden"
+                        onchange="toggleAdjustedBRate()">
+                    <label for="b-rate-follow" class="px-4 py-2 rounded-lg cursor-pointer">ปฏิบัติตาม</label>
+
+                    <input type="radio" id="b-rate-adjust" name="b-rate" value="ปรับตาม" class="hidden"
+                        onchange="toggleAdjustedBRate()">
+                    <label for="b-rate-adjust" class="px-4 py-2 rounded-lg cursor-pointer">ปรับตาม</label>
+
+                    <input type="number" id="b-rate-adjusted" placeholder="ระบุอัตรา (กระสอบ/ไร่)" min="0.1" step="0.1"
+                        class="hidden ml-4">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium mb-1">อัตราการใส่นาโนที่แนะนำ (เช่น 1 ลิตร / 1 ไร่)
+                    <span class="text-red-500">กรุณาเลือกก่อนบันทึก</span></label>
+                <div class="radio-group flex items-center flex-wrap gap-2">
+                    <input type="radio" id="b-nano-rate-follow" name="b-nano-rate" value="ปฏิบัติตาม" required
+                        class="hidden" onchange="toggleAdjustedBNanoRate()">
+                    <label for="b-nano-rate-follow" class="px-4 py-2 rounded-lg cursor-pointer">ปฏิบัติตาม</label>
+
+                    <input type="radio" id="b-nano-rate-adjust" name="b-nano-rate" value="ปรับตาม" class="hidden"
+                        onchange="toggleAdjustedBNanoRate()">
+                    <label for="b-nano-rate-adjust" class="px-4 py-2 rounded-lg cursor-pointer">ปรับตาม</label>
+
+                    <input type="number" id="b-nano-rate-adjusted" placeholder="ระบุอัตรา (ลิตร/ไร่)" min="0.1"
+                        step="0.1" class="hidden ml-4">
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div>
+                <label for="b-recorder" class="block text-sm font-medium mb-1">ผู้บันทึก<span
+                        class="text-red-500">(ใครเป็นคนบันทึก)</span></label>
+            </div>
+            <div class="radio-group flex flex-wrap gap-2">
+                <input type="radio" id="b-recorder-long" name="b-recorder" value="ตัวแทน" required>
+                <label for="b-recorder-long" class="px-4 py-2 rounded-lg cursor-pointer">ตัวแทน</label>
+
+                <input type="radio" id="b-recorder-kk" name="b-recorder" value="เกษตรกร" required>
+                <label for="b-recorder-kk" class="px-4 py-2 rounded-lg cursor-pointer">เกษตรกร</label>
+            </div>
+        </div>
+
+        <button type="submit" class="w-full search-button py-3 mt-6 rounded-lg">
+            บันทึกข้อมูลการใช้ 4-7-16
+        </button>
+        </form>
+    </div>
+
+    <!-- SHEET C VIEW -->
+    <div id="sheet-c-view" class="space-y-6 hidden">
+        <div class="w-full pt-6 pb-2 px-6">
+            <h2 class="text-2xl font-bold text-stone-700">
+                สรุปข้อมูลเกษตรกรทั้งหมดของตัวแทน
+            </h2>
+        </div>
+
+        <div class="space-y-4 pt-4 border rounded-lg p-4 bg-stone-50">
+            <h3 class="text-lg font-semibold text-stone-700">ข้อมูลเกษตรกรของคุณ</h3>
+
+            <div class="flex flex-col md:flex-row gap-4 items-center">
+                <div class="flex-grow">
+                    <p class="text-sm text-stone-600" id="auto-long-name">
+                        <!-- แสดงชื่อตัวแทนอัตโนมัติ -->
+                    </p>
+                </div>
                 <div>
-                    <div>
-                        <label for="b-recorder" class="block text-sm font-medium mb-1">ผู้บันทึก<span
-                                class="text-red-500">(ใครเป็นคนบันทึก)</span></label>
-                    </div>
-                    <div class="radio-group flex flex-wrap gap-2">
-                        <input type="radio" id="b-recorder-long" name="b-recorder" value="ตัวแทน" required>
-                        <label for="b-recorder-long" class="px-4 py-2 rounded-lg cursor-pointer">ตัวแทน</label>
-
-                        <input type="radio" id="b-recorder-kk" name="b-recorder" value="เกษตรกร" required>
-                        <label for="b-recorder-kk" class="px-4 py-2 rounded-lg cursor-pointer">เกษตรกร</label>
-                    </div>
+                    <button onclick="fetchSummaryData()"
+                        class="search-button py-2.5 px-6 rounded-lg whitespace-nowrap flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                            stroke="currentColor" class="w-5 h-5 mr-1">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                        </svg>
+                        โหลดข้อมูลเกษตรกร
+                    </button>
                 </div>
-
-                <button type="submit" class="w-full search-button py-3 mt-6 rounded-lg">
-                    บันทึกข้อมูลการใช้ 4-7-16
-                </button>
-            </form>
+            </div>
+            <div id="summary-count" class="text-sm text-stone-600 font-semibold">
+                กดปุ่ม "โหลดข้อมูลเกษตรกร" เพื่อดูข้อมูล
+            </div>
         </div>
 
-        <!-- SHEET C VIEW -->
-        <div id="sheet-c-view" class="space-y-6 hidden">
+        <!-- Data Display Section -->
+        <div id="summary-data-container" class="overflow-x-auto rounded-xl border border-stone-200 shadow-lg hidden">
+            <table class="min-w-full divide-y divide-gray-300 data-table">
+                <thead class="bg-stone-100">
+                    <tr class="text-sm uppercase text-stone-700">
+                        <th class="px-4 py-3 text-left">รหัสเกษตรกร</th>
+                        <th class="px-4 py-3 text-left">ชื่อ-สกุล</th>
+                        <th class="px-4 py-3 text-left">เบอร์โทร</th>
+                        <th class="px-4 py-3 text-left">ขนาดแปลง</th>
+                        <th class="px-4 py-3 text-left">สายพันธุ์</th>
+                        <th class="px-4 py-3 text-left">วันที่รับแร่</th>
+                        <th class="px-4 py-3 text-left">จำนวนแร่</th>
+                        <th class="px-4 py-3 text-left">วันที่รับนาโน</th>
+                        <th class="px-4 py-3 text-left">จำนวนนาโน</th>
+                        <th class="px-4 py-3 text-left">ค่าสารก่อนใช้</th>
+                        <th class="px-4 py-3 text-left">สถานะ</th>
+                    </tr>
+                </thead>
+                <tbody id="summary-table-body" class="divide-y divide-gray-200 text-sm bg-white">
+                    <!-- Data will be populated here -->
+                </tbody>
+            </table>
+        </div>
+
+        <div id="summary-loading" class="text-center p-8 text-stone-500 hidden">
+            <div class="animate-spin rounded-full h-8 w-8 border-2 border-stone-400 border-t-stone-800 mx-auto mb-2">
+            </div>
+            กำลังดึงข้อมูล...
+        </div>
+
+        <div id="summary-empty" class="text-center p-8 text-stone-500 hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-2 text-stone-400" fill="none"
+                viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p>ไม่พบข้อมูลเกษตรกรสำหรับตัวแทนนี้</p>
+        </div>
+    </div>
+
+    <div id="admin-view" class="space-y-6 hidden overflow-y-auto max-h-screen">
+
+        <div class="w-full pt-6 pb-2 px-6">
+            <h2 class="text-2xl font-bold text-stone-700">
+                หน้าผู้ดูแลระบบ (Admin)
+            </h2>
+        </div>
+
+        <div class="space-y-4 pt-4 border rounded-lg p-4 bg-stone-50">
+            <div class="flex items-center justify-between gap-4">
+                <div>
+                    <p class="text-sm text-stone-600">เข้าสู่ระบบ: <span id="admin-current-user"
+                            class="font-semibold"></span></p>
+                </div>
+                <div class="flex gap-2">
+                    <button id="admin-refresh-btn" class="search-button py-2 px-4 rounded-lg"
+                        onclick="adminCheckAuthAndInit()">
+                        โหลดสถานะ / รีเฟรช
+                    </button>
+                    <button id="admin-logout-btn" class="bg-red-500 text-white px-4 py-2 rounded-lg"
+                        onclick="adminForceLogout()">
+                        ออกระบบ
+                    </button>
+                </div>
+            </div>
+            <div id="admin-access-warning" class="text-red-600 text-sm hidden">
+                คุณไม่มีสิทธิ์เข้าถึงหน้านี้
+            </div>
+        </div>
+
+        <nav class="nav-tabs">
+
+            <button class="nav-tab active" data-target="admin-kratom" data-section-color="orange"
+                onclick="showSection('admin-kratom', this)">ดูข้อมูลทั้งหมด</button>
+
+            <button class="nav-tab" data-target="admin-lounge" data-section-color="blue"
+                onclick="showSection('admin-lounge', this)">2. คู่มือสำหรับตัวแทน</button>
+        </nav>
+
+        <div id="admin-kratom" class="content-section active">
             <div class="w-full pt-6 pb-2 px-6">
                 <h2 class="text-2xl font-bold text-stone-700">
-                    สรุปข้อมูลเกษตรกรทั้งหมดของตัวแทน
+                    หน้าเพื่อดูและดาวน์โหลดข้อมูลทุกไฟล์ Sheet A / Sheet B / สรุป
                 </h2>
             </div>
 
-            <div class="space-y-4 pt-4 border rounded-lg p-4 bg-stone-50">
-                <h3 class="text-lg font-semibold text-stone-700">ข้อมูลเกษตรกรของคุณ</h3>
+            <div id="admin-controls" class="space-y-4 hidden">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <button id="btn-fetch-farmers" class="pastel-button py-3" onclick="adminFetchAllFarmers()">
+                        ดึงข้อมูลทั้งหมด (Sheet A)
+                    </button>
+                    <button id="btn-fetch-usage" class="search-button py-3" onclick="adminFetchAllUsage()">
+                        ดึงข้อมูลการใช้ (Sheet B)
+                    </button>
+                    <button id="btn-fetch-merged" class="blue-button py-3" onclick="adminFetchMerged()">
+                        ดึงข้อมูลรวม (Merge)
+                    </button>
+                </div>
 
-                <div class="flex flex-col md:flex-row gap-4 items-center">
-                    <div class="flex-grow">
-                        <p class="text-sm text-stone-600" id="auto-long-name">
-                            <!-- แสดงชื่อตัวแทนอัตโนมัติ -->
-                        </p>
-                    </div>
-                    <div>
-                        <button onclick="fetchSummaryData()"
-                            class="search-button py-2.5 px-6 rounded-lg whitespace-nowrap flex items-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                                stroke="currentColor" class="w-5 h-5 mr-1">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-                            </svg>
-                            โหลดข้อมูลเกษตรกร
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <h4 class="text-sm font-semibold text-yellow-800 mb-3">🔧 เครื่องมือทดสอบระบบ</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                        <button id="btn-simple-test" class="bg-yellow-500 text-white py-2 px-3 rounded text-sm"
+                            onclick="adminSimpleTest()">
+                            ทดสอบ Basic
+                        </button>
+                        <button id="btn-sheet-test" class="bg-orange-500 text-white py-2 px-3 rounded text-sm"
+                            onclick="adminTestSheetAccess()">
+                            ทดสอบ Sheet Access
+                        </button>
+                        <button id="btn-admin-conn" class="bg-red-500 text-white py-2 px-3 rounded text-sm"
+                            onclick="testAdminConnection()">
+                            ทดสอบ Admin Connection
                         </button>
                     </div>
                 </div>
-                <div id="summary-count" class="text-sm text-stone-600 font-semibold">
-                    กดปุ่ม "โหลดข้อมูลเกษตรกร" เพื่อดูข้อมูล
+
+                <!-- เพิ่มในส่วน admin-controls หลังจากปุ่มทดสอบเดิม -->
+                <div class="bg-red-50 border border-red-200 rounded-lg p-4 mt-4">
+                    <h4 class="text-sm font-semibold text-red-800 mb-3">🚨 ทดสอบ getAllFarmers โดยตรง</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        <button id="btn-direct-getAll" class="bg-red-600 text-white py-2 px-3 rounded text-sm"
+                            onclick="directTestGetAllFarmers()">
+                            ทดสอบ getAllFarmers โดยตรง
+                        </button>
+                        <button id="btn-debug-getAll" class="bg-purple-600 text-white py-2 px-3 rounded text-sm"
+                            onclick="testGetAllFarmersDebug()">
+                            ทดสอบ getAllFarmersDebug
+                        </button>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Data Display Section -->
-            <div id="summary-data-container"
-                class="overflow-x-auto rounded-xl border border-stone-200 shadow-lg hidden">
-                <table class="min-w-full divide-y divide-gray-300 data-table">
-                    <thead class="bg-stone-100">
-                        <tr class="text-sm uppercase text-stone-700">
-                            <th class="px-4 py-3 text-left">รหัสเกษตรกร</th>
-                            <th class="px-4 py-3 text-left">ชื่อ-สกุล</th>
-                            <th class="px-4 py-3 text-left">เบอร์โทร</th>
-                            <th class="px-4 py-3 text-left">ขนาดแปลง</th>
-                            <th class="px-4 py-3 text-left">สายพันธุ์</th>
-                            <th class="px-4 py-3 text-left">วันที่รับแร่</th>
-                            <th class="px-4 py-3 text-left">จำนวนแร่</th>
-                            <th class="px-4 py-3 text-left">วันที่รับนาโน</th>
-                            <th class="px-4 py-3 text-left">จำนวนนาโน</th>
-                            <th class="px-4 py-3 text-left">ค่าสารก่อนใช้</th>
-                            <th class="px-4 py-3 text-left">สถานะ</th>
-                        </tr>
-                    </thead>
-                    <tbody id="summary-table-body" class="divide-y divide-gray-200 text-sm bg-white">
-                        <!-- Data will be populated here -->
-                    </tbody>
-                </table>
-            </div>
-
-            <div id="summary-loading" class="text-center p-8 text-stone-500 hidden">
-                <div
-                    class="animate-spin rounded-full h-8 w-8 border-2 border-stone-400 border-t-stone-800 mx-auto mb-2">
+                <div class="flex gap-3">
+                    <input id="admin-search-input" type="text" placeholder="ค้นหาตามรหัส หรือ ชื่อ" maxlength="100"
+                        class="w-full p-2 border rounded" />
+                    <button id="admin-search-btn" class="search-button px-4" onclick="adminFilterTable()">ค้นหา</button>
+                    <button id="admin-export-btn" class="pastel-button px-4"
+                        onclick="adminExportCurrentToCSV()">ดาวน์โหลด
+                        CSV</button>
                 </div>
-                กำลังดึงข้อมูล...
-            </div>
 
-            <div id="summary-empty" class="text-center p-8 text-stone-500 hidden">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-2 text-stone-400" fill="none"
-                    viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <p>ไม่พบข้อมูลเกษตรกรสำหรับตัวแทนนี้</p>
+                <div id="admin-loading" class="text-center p-6 hidden">
+                    <div class="loading-spinner mx-auto mb-2"></div>
+                    กำลังโหลดข้อมูล...
+                </div>
+
+                <div id="admin-results" class="space-y-4">
+                    <div id="admin-table-wrapper" class="overflow-x-auto bg-white rounded-lg border p-4 hidden">
+                        <h3 class="font-semibold text-stone-700 mb-2">ผลลัพธ์</h3>
+                        <div id="admin-table-container" class="admin-table-scroll"></div>
+                    </div>
+
+                    <div id="admin-empty" class="text-stone-500 p-4 hidden">
+                        ยังไม่มีข้อมูลที่จะแสดง
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div id="admin-view" class="space-y-6 hidden overflow-y-auto max-h-screen">
-
-            <div class="w-full pt-6 pb-2 px-6">
-                <h2 class="text-2xl font-bold text-stone-700">
-                    หน้าผู้ดูแลระบบ (Admin)
-                </h2>
-            </div>
-
-            <div class="space-y-4 pt-4 border rounded-lg p-4 bg-stone-50">
-                <div class="flex items-center justify-between gap-4">
-                    <div>
-                        <p class="text-sm text-stone-600">เข้าสู่ระบบ: <span id="admin-current-user"
-                                class="font-semibold"></span></p>
-                    </div>
-                    <div class="flex gap-2">
-                        <button id="admin-refresh-btn" class="search-button py-2 px-4 rounded-lg"
-                            onclick="adminCheckAuthAndInit()">
-                            โหลดสถานะ / รีเฟรช
-                        </button>
-                        <button id="admin-logout-btn" class="bg-red-500 text-white px-4 py-2 rounded-lg"
-                            onclick="adminForceLogout()">
-                            ออกระบบ
-                        </button>
-                    </div>
-                </div>
-                <div id="admin-access-warning" class="text-red-600 text-sm hidden">
-                    คุณไม่มีสิทธิ์เข้าถึงหน้านี้
-                </div>
-            </div>
-
-            <nav class="nav-tabs">
-
-                <button class="nav-tab active" data-target="admin-kratom" data-section-color="orange"
-                    onclick="showSection('admin-kratom', this)">ดูข้อมูลทั้งหมด</button>
-
-                <button class="nav-tab" data-target="admin-lounge" data-section-color="blue"
-                    onclick="showSection('admin-lounge', this)">2. คู่มือสำหรับตัวแทน</button>
-            </nav>
-
-            <div id="admin-kratom" class="content-section active">
-                <div class="w-full pt-6 pb-2 px-6">
-                    <h2 class="text-2xl font-bold text-stone-700">
-                        หน้าเพื่อดูและดาวน์โหลดข้อมูลทุกไฟล์ Sheet A / Sheet B / สรุป
-                    </h2>
-                </div>
-
-                <div id="admin-controls" class="space-y-4 hidden">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <button id="btn-fetch-farmers" class="pastel-button py-3" onclick="adminFetchAllFarmers()">
-                            ดึงข้อมูลทั้งหมด (Sheet A)
-                        </button>
-                        <button id="btn-fetch-usage" class="search-button py-3" onclick="adminFetchAllUsage()">
-                            ดึงข้อมูลการใช้ (Sheet B)
-                        </button>
-                        <button id="btn-fetch-merged" class="blue-button py-3" onclick="adminFetchMerged()">
-                            ดึงข้อมูลรวม (Merge)
-                        </button>
-                    </div>
-
-                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                        <h4 class="text-sm font-semibold text-yellow-800 mb-3">🔧 เครื่องมือทดสอบระบบ</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
-                            <button id="btn-simple-test" class="bg-yellow-500 text-white py-2 px-3 rounded text-sm"
-                                onclick="adminSimpleTest()">
-                                ทดสอบ Basic
-                            </button>
-                            <button id="btn-sheet-test" class="bg-orange-500 text-white py-2 px-3 rounded text-sm"
-                                onclick="adminTestSheetAccess()">
-                                ทดสอบ Sheet Access
-                            </button>
-                            <button id="btn-admin-conn" class="bg-red-500 text-white py-2 px-3 rounded text-sm"
-                                onclick="testAdminConnection()">
-                                ทดสอบ Admin Connection
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- เพิ่มในส่วน admin-controls หลังจากปุ่มทดสอบเดิม -->
-                    <div class="bg-red-50 border border-red-200 rounded-lg p-4 mt-4">
-                        <h4 class="text-sm font-semibold text-red-800 mb-3">🚨 ทดสอบ getAllFarmers โดยตรง</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                            <button id="btn-direct-getAll" class="bg-red-600 text-white py-2 px-3 rounded text-sm"
-                                onclick="directTestGetAllFarmers()">
-                                ทดสอบ getAllFarmers โดยตรง
-                            </button>
-                            <button id="btn-debug-getAll" class="bg-purple-600 text-white py-2 px-3 rounded text-sm"
-                                onclick="testGetAllFarmersDebug()">
-                                ทดสอบ getAllFarmersDebug
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="flex gap-3">
-                        <input id="admin-search-input" type="text" placeholder="ค้นหาตามรหัส หรือ ชื่อ" maxlength="100"
-                            class="w-full p-2 border rounded" />
-                        <button id="admin-search-btn" class="search-button px-4"
-                            onclick="adminFilterTable()">ค้นหา</button>
-                        <button id="admin-export-btn" class="pastel-button px-4"
-                            onclick="adminExportCurrentToCSV()">ดาวน์โหลด
-                            CSV</button>
-                    </div>
-
-                    <div id="admin-loading" class="text-center p-6 hidden">
-                        <div class="loading-spinner mx-auto mb-2"></div>
-                        กำลังโหลดข้อมูล...
-                    </div>
-
-                    <div id="admin-results" class="space-y-4">
-                        <div id="admin-table-wrapper" class="overflow-x-auto bg-white rounded-lg border p-4 hidden">
-                            <h3 class="font-semibold text-stone-700 mb-2">ผลลัพธ์</h3>
-                            <div id="admin-table-container" class="admin-table-scroll"></div>
-                        </div>
-
-                        <div id="admin-empty" class="text-stone-500 p-4 hidden">
-                            ยังไม่มีข้อมูลที่จะแสดง
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="admin-lounge" class="content-section hidden">
-                <h2>คู่มือสำหรับตัวแทน</h2>
-                <div class="p-4 bg-white border rounded">
-                    <p class="text-sm text-stone-600">คู่มือ / คำแนะนำสำหรับผู้ใช้งานตัวแทน (Placeholder)</p>
-                </div>
+        <div id="admin-lounge" class="content-section hidden">
+            <h2>คู่มือสำหรับตัวแทน</h2>
+            <div class="p-4 bg-white border rounded">
+                <p class="text-sm text-stone-600">คู่มือ / คำแนะนำสำหรับผู้ใช้งานตัวแทน (Placeholder)</p>
             </div>
         </div>
+    </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -3883,7 +3881,7 @@
 
                     if (result && result.success) {
                         showMessageBox("✅ บันทึกสำเร็จ!",
-                            `บันทึกข้อมูลการรับแร่และนาโนของ **${formData['a-fullname']}** รหัส **${formData['a-id']}** เข้าระบบเรียบร้อยแล้ว 
+                            `บันทึกข้อมูล **${formData['a-fullname']}** รหัส **${formData['a-id']}** เข้าระบบเรียบร้อยแล้ว 
                             <br><br>แถวที่บันทึก: **${result.data?.row || 'N/A'}**
                             <br>เวลา: ${new Date().toLocaleTimeString('th-TH')}`
                         );
@@ -4178,9 +4176,7 @@
                 if (nEl) nEl.innerHTML = '<p class="text-stone-500">- ยังไม่มีข้อมูล -</p>';
                 if (mEl) mEl.innerHTML = '<p class="text-stone-500">- ยังไม่มีข้อมูล -</p>';
 
-                const postMitraEl = document.querySelector('[data-field="b-post-mitra"]');
-                if (postMitraEl) postMitraEl.textContent = '---';
-                return;
+
             }
 
             const latestUsage = usageData[0];
@@ -4188,23 +4184,13 @@
             const fertilizerUsage = latestUsage['b-fertilizer-usage'] || '';
             const nanoUsage = latestUsage['b-nano-usage'] || '';
             const mineralUsage = latestUsage['b-mineral-usage'] || '';
-            const postMitra = latestUsage['b-post-mitra'] || '---';
+
 
             displayUsageText('b-fertilizer-usage-display', fertilizerUsage);
             displayUsageText('b-nano-usage-display', nanoUsage);
             displayUsageText('b-mineral-usage-display', mineralUsage);
 
-            const postMitraElement = document.querySelector('[data-field="b-post-mitra"]');
-            if (postMitraElement) {
-                if (postMitra && postMitra !== '' && postMitra !== '---') {
-                    const num = parseFloat(postMitra);
-                    postMitraElement.textContent = isNaN(num) ? '---' : num.toFixed(2);
-                    postMitraElement.className = 'text-xl font-bold text-blue-600';
-                } else {
-                    postMitraElement.textContent = '---';
-                    postMitraElement.className = 'text-xl font-bold text-gray-400';
-                }
-            }
+
         }
 
         function updateSheetBReadonlyData(sheetAData) {
@@ -4411,11 +4397,7 @@
                     return;
                 }
 
-                const phone = document.getElementById('b-phone-use')?.value.trim();
-                if (!phone) {
-                    showMessageBox("❌ ขาดข้อมูล!", "กรุณากรอกเบอร์โทรศัพท์เกษตรกร");
-                    return;
-                }
+
 
                 const recorderElement = document.querySelector('input[name="b-recorder"]:checked');
                 if (!recorderElement) {
@@ -4482,7 +4464,6 @@
                     'b-long-affiliation': longAffiliation,
                     'b-farmer-id': farmerId,
                     'b-fullname': fullname,
-                    'b-phone': phone,
                     'b-fertilizer-usage': usageData.fertilizerUsage,
                     'b-nano-usage': usageData.nanoUsage,
                     'b-mineral-usage': usageData.mineralUsage,
@@ -4505,7 +4486,7 @@
 
                         if (result && result.success) {
                             showMessageBox("✅ บันทึกสำเร็จ!",
-                                `บันทึกข้อมูลการใช้ 4-7-16 ของ **${formData['b-fullname']}** เรียบร้อยแล้ว
+                                `บันทึกข้อมูลบริหารจัดการแปลง ของ **${formData['b-fullname']}** เรียบร้อยแล้ว
                                 <br><br>แถวที่บันทึก: **${result.data?.row || 'N/A'}**
                                 <br>ชีท: **${result.data?.sheet || 'N/A'}**
                                 <br>เวลา: ${new Date().toLocaleTimeString('th-TH')}`
@@ -4638,11 +4619,9 @@
                 'b-long-affiliation': document.getElementById('b-long-affiliation-use')?.value,
                 'b-farmer-id': document.getElementById('b-farmer-id-use')?.value.trim(),
                 'b-fullname': document.getElementById('b-fullname-use')?.value.trim(),
-                'b-phone': document.getElementById('b-phone-use')?.value.trim() || '',
                 'b-fertilizer-usage': usageData.fertilizerUsage,
                 'b-nano-usage': usageData.nanoUsage,
                 'b-mineral-usage': usageData.mineralUsage,
-                'b-premitra': parseFloat(document.getElementById('b-premitra')?.value || 0),
                 'b-rate': form.querySelector('input[name="b-rate"]:checked')?.value,
                 'b-rate-adjusted': document.getElementById('b-rate-adjusted')?.value ? parseFloat(document.getElementById('b-rate-adjusted').value) : '',
                 'b-nano-rate': form.querySelector('input[name="b-nano-rate"]:checked')?.value,
@@ -4685,7 +4664,7 @@
                             showMessageBox("❌ ข้อผิดพลาด",
                                 `ไม่สามารถบันทึกข้อมูลได้: ${result && result.message ? result.message : 'ความสัมพันธ์ข้อมูลไม่ถูกต้อง'}
                                  <br><br>กรุณาตรวจสอบว่า:
-                                 <br>• ดูแลตัวแทนได้บันทึกข้อมูลการรับแร่/นาโนของเกษตรกรหรือยัง
+                                 <br>• ผู้ดูแลตัวแทนได้บันทึกข้อมูลบริหารจัดการแปลงของเกษตรกรหรือยัง
                                  <br>• รหัสเกษตรกรถูกต้องไหม
                                  <br>• เลือกตัวแทนที่สังกัดถูกต้องไหม`);
                             resolve(false);
