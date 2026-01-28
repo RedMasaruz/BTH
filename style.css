@@ -1638,4 +1638,20 @@ hr {
         font-size: 0.8rem !important;
         padding: 4px 8px !important;
     }
+
+    /* =========================================
+       Fix for Standard Contract Section Layout
+       (Force 1 column on mobile)
+       ========================================= */
+    #section-standard-contract>div.grid {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+
+    /* Ensure the inner date grids (Start/End date) are also full width or properly sized */
+    #section-standard-contract .grid-cols-2 {
+        /* Keep 2 columns for dates but ensure they fit */
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 0.5rem !important;
+    }
 }
