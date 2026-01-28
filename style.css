@@ -1641,15 +1641,16 @@ hr {
 
     /* =========================================
        Fix for Standard Contract Section Layout
-       (Force 1 column on mobile/tablet)
+       (Force 1 column on mobile/tablet/small laptops)
        ========================================= */
-    #section-standard-contract>div.grid {
+    #section-standard-contract .grid {
         display: flex !important;
         flex-direction: column !important;
+        grid-template-columns: 1fr !important;
         gap: 1rem !important;
     }
 
-    #section-standard-contract>div.grid>div {
+    #section-standard-contract .grid>div {
         width: 100% !important;
     }
 
@@ -1659,5 +1660,6 @@ hr {
         display: grid !important;
         grid-template-columns: repeat(2, 1fr) !important;
         gap: 0.5rem !important;
+        width: 100% !important;
     }
 }
