@@ -1480,11 +1480,7 @@
                             <input type="text" id="b-fullname-use" placeholder="ชื่อ-สกุลเกษตรกร" required
                                 class="w-full">
                         </div>
-                        <div>
-                            <label for="b-phone-use" class="block text-sm font-medium mb-1">เบอร์โทรศัพท์ *</label>
-                            <input type="tel" id="b-phone-use" placeholder="เบอร์โทรศัพท์" required
-                                pattern="[0-9]{9,15}" class="w-full">
-                        </div>
+
                     </div>
                 </div>
 
@@ -3153,11 +3149,7 @@
                     return;
                 }
 
-                const phone = document.getElementById('b-phone-use')?.value.trim();
-                if (!phone) {
-                    showMessageBox("❌ ขาดข้อมูล!", "กรุณากรอกเบอร์โทรศัพท์เกษตรกร");
-                    return;
-                }
+
 
                 const recorderElement = document.querySelector('input[name="b-recorder"]:checked');
                 if (!recorderElement) {
@@ -3380,7 +3372,7 @@
                 'b-long-affiliation': document.getElementById('b-long-affiliation-use')?.value,
                 'b-farmer-id': document.getElementById('b-farmer-id-use')?.value.trim(),
                 'b-fullname': document.getElementById('b-fullname-use')?.value.trim(),
-                'b-phone': document.getElementById('b-phone-use')?.value.trim() || '',
+                'b-phone': '',
                 'b-fertilizer-usage': usageData.fertilizerUsage,
                 'b-nano-usage': usageData.nanoUsage,
                 'b-mineral-usage': usageData.mineralUsage,
