@@ -1540,3 +1540,73 @@ hr {
         padding-bottom: env(safe-area-inset-bottom);
     }
 }
+
+/* =========================================
+   Mobile Overrides for Specific Sections
+   (Standard Contract & Species Info)
+   ========================================= */
+@media (max-width: 600px) {
+
+    /* Target only the specific sections by ID */
+    #section-standard-contract,
+    #section-species-info {
+        padding: 12px 10px !important;
+    }
+
+    /* Smaller labels */
+    #section-standard-contract .form-label,
+    #section-species-info .form-label {
+        font-size: 0.8rem !important;
+        margin-bottom: 2px !important;
+    }
+
+    /* Smaller inputs and tight padding */
+    #section-standard-contract input,
+    #section-standard-contract select,
+    #section-standard-contract textarea,
+    #section-standard-contract .btn,
+    #section-species-info input,
+    #section-species-info select,
+    #section-species-info textarea,
+    #section-species-info .btn {
+        font-size: 0.8rem !important;
+        padding: 6px 8px !important;
+        height: auto !important;
+        min-height: 32px;
+    }
+
+    /* Adjust checkbox/radio labels */
+    #section-standard-contract label.cursor-pointer,
+    #section-species-info label.cursor-pointer {
+        font-size: 0.75rem !important;
+        padding-left: 2px;
+    }
+
+    /* Tighter spacing between grid items */
+    #section-standard-contract .grid,
+    #section-species-info .grid,
+    #section-species-info .flex-wrap {
+        gap: 0.5rem !important;
+    }
+
+    #section-standard-contract .gap-4,
+    #section-species-info .gap-3 {
+        gap: 0.5rem !important;
+    }
+
+    /* Slightly scale down checkboxes/radios */
+    #section-standard-contract input[type="checkbox"],
+    #section-standard-contract input[type="radio"],
+    #section-species-info input[type="checkbox"],
+    #section-species-info input[type="radio"] {
+        transform: scale(0.9);
+        margin-right: 4px;
+    }
+
+    /* Section titles smaller */
+    #section-standard-contract .section-title,
+    #section-species-info .section-title {
+        font-size: 1rem !important;
+        margin-bottom: 0.75rem !important;
+    }
+}
