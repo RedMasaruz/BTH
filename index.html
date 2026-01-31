@@ -2214,29 +2214,66 @@
         // =============================================
         // CONSTANTS
         // =============================================
-        const LONG_OPTIONS = [
-            { value: "", text: "--- เลือกตัวแทนที่สังกัด ---" },
-            { value: "ตัวแทนบาสBDS", text: "ตัวแทนบาสBDS" },
-            { value: "ตัวแทนHunterเวียงแก่น", text: "ตัวแทนHunterเวียงแก่น" },
-            { value: "ตัวแทนก้ามท่าแค", text: "ตัวแทนก้ามท่าแค" },
-            { value: "ตัวแทนกระรอก", text: "ตัวแทนกระรอก" },
-            { value: "ตัวแทนรัชช์เมืองนคร", text: "ตัวแทนรัชช์เมืองนคร" },
-            { value: "ตัวแทนตูนบางขัน", text: "ตัวแทนตูนบางขัน" },
-            { value: "ตัวแทนป๋องส์เมืองพัทลุง", text: "ตัวแทนป๋องส์เมืองพัทลุง" },
-            { value: "ตัวแทนบจก.จินดารัตน์ โปรดักส์", text: "ตัวแทนบจก.จินดารัตน์ โปรดักส์" },
-            { value: "ตัวแทนดอน", text: "ตัวแทนดอน" },
-            { value: "ตัวแทนเตยเกรซ", text: "ตัวแทนเตยเกรซ" },
-            { value: "ตัวแทนสมพงศ์พะยูนตรัง", text: "ตัวแทนสมพงศ์พะยูนตรัง" },
-            { value: "ตัวแทนกระท่อมปลอดสารคลองใหม่พัทลุง", text: "ตัวแทนกระท่อมปลอดสารคลองใหม่พัทลุง" },
-            { value: "ตัวแทนหรั่งนุ้ยพระนคร", text: "ตัวแทนหรั่งนุ้ยพระนคร" },
-            { value: "ตัวแทนเปรี้ยวหล่มสัก", text: "ตัวแทนเปรี้ยวหล่มสัก" },
-            { value: "ตัวแทนพี.เจ.กระท่อมทอง", text: "ตัวแทนพี.เจ.กระท่อมทอง" },
-            { value: "ตัวแทนทรัพย์มะรุมฟาร์ม", text: "ตัวแทนทรัพย์มะรุมฟาร์ม" },
-            { value: "ตัวแทนสวนอิน-จักรภัทร", text: "ตัวแทนสวนอิน-จักรภัทร" },
-            { value: "ตัวแทนรักษ์อุทัย", text: "ตัวแทนรักษ์อุทัย" },
-            { value: "ตัวแทนวิทย์วิสาหกิจชุมชนชาววัง", text: "ตัวแทนวิทย์วิสาหกิจชุมชนชาววัง" },
-            { value: "ตัวแทนสาโรจน์", text: "ตัวแทนสาโรจน์" },
+        // Dynamic dropdown options - fetched from Google Sheet
+        let LONG_OPTIONS = [
+            { value: "", text: "--- กำลังโหลดข้อมูล... ---" }
         ];
+
+        // Flag to track if options have been loaded
+        let longOptionsLoaded = false;
+
+        /**
+         * Fetch agent options from backend (Google Sheet)
+         * @returns {Promise} Resolves when options are loaded
+         */
+        async function fetchLongOptionsFromBackend() {
+            if (longOptionsLoaded) {
+                console.log('✅ LONG_OPTIONS already loaded, skipping fetch');
+                return;
+            }
+
+            console.log('🔄 Fetching LONG_OPTIONS from backend...');
+
+            try {
+                // Check if google.script.run is available
+                if (typeof google !== 'undefined' && google.script && google.script.run) {
+                    return new Promise((resolve, reject) => {
+                        google.script.run
+                            .withSuccessHandler(function (result) {
+                                if (result && result.success && result.options) {
+                                    LONG_OPTIONS = result.options;
+                                    longOptionsLoaded = true;
+                                    console.log(`✅ Loaded ${LONG_OPTIONS.length} agent options from backend`);
+                                    // Re-populate dropdowns after loading
+                                    populateLongOptions('.long-affiliation');
+                                    resolve();
+                                } else {
+                                    console.error('❌ Failed to load agent options from backend');
+                                    LONG_OPTIONS = [{ value: "", text: "--- ไม่สามารถโหลดข้อมูลได้ ---" }];
+                                    populateLongOptions('.long-affiliation');
+                                    resolve();
+                                }
+                            })
+                            .withFailureHandler(function (error) {
+                                console.error('❌ Error fetching LONG_OPTIONS:', error);
+                                LONG_OPTIONS = [{ value: "", text: "--- เกิดข้อผิดพลาด ---" }];
+                                populateLongOptions('.long-affiliation');
+                                resolve();
+                            })
+                            .getLongOptions();
+                    });
+                } else {
+                    // Running externally without backend
+                    console.warn('⚠️ google.script.run not available');
+                    LONG_OPTIONS = [{ value: "", text: "--- ต้องใช้งานผ่าน Google Apps Script ---" }];
+                    populateLongOptions('.long-affiliation');
+                }
+            } catch (e) {
+                console.error('❌ Exception in fetchLongOptionsFromBackend:', e);
+                LONG_OPTIONS = [{ value: "", text: "--- เกิดข้อผิดพลาด ---" }];
+                populateLongOptions('.long-affiliation');
+            }
+        }
 
         // Timing constants for consistent delays across the application
         const DROPDOWN_SELECT_DELAY_MS = 50;         // Delay after populate before auto-select
@@ -3721,6 +3758,8 @@
 
         document.addEventListener('DOMContentLoaded', function () {
             initializeFertilizerCheckboxes();
+            // Fetch agent options from backend
+            fetchLongOptionsFromBackend();
         });
 
         // =============================================

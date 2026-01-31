@@ -84,7 +84,8 @@ const ALLOWED_FUNCTIONS = [
   'getAdminDashboardData',
   'getAgentLots',
   'getFarmersWithSheetBRecords',
-  'updateMultipleLotState'
+  'updateMultipleLotState',
+  'getLongOptions'
 ];
 
 // Survey-specific resources (Slides template, destination sheet & folder for PDFs)
@@ -105,6 +106,44 @@ const MAX_SEARCH_QUERY_LENGTH = 100;
 const SEARCH_DEBOUNCE_MS = 300;
 const MAX_SPECIES_COUNT = 1000000;
 const MAX_SPECIES_NAME_LENGTH = 100;
+
+/* ========== DYNAMIC DROPDOWN OPTIONS ========== */
+/**
+ * Fetches agent options from AgentOptions sheet for dropdown population
+ * Display text shows name without prefix, but value includes 'ตัวแทน' prefix for Sheet B reference
+ * @returns {Object} {success, options: Array of {value, text}}
+ */
+function getLongOptions() {
+  try {
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID_A);
+    const sheet = ss.getSheetByName('AgentOptions');
+    
+    if (!sheet) {
+      console.log('⚠️ AgentOptions sheet not found, returning empty option');
+      return { success: true, options: [{ value: "", text: "--- เลือกตัวแทนที่สังกัด ---" }] };
+    }
+    
+    const data = sheet.getDataRange().getValues();
+    const options = [{ value: "", text: "--- เลือกตัวแทนที่สังกัด ---" }];
+    
+    // Skip header row (row 0), read column A (agent name)
+    for (let i = 1; i < data.length; i++) {
+      const agentName = data[i][0];
+      if (agentName && String(agentName).trim()) {
+        const displayName = String(agentName).trim();
+        // Add 'ตัวแทน' prefix to value for Sheet B reference
+        const valueWithPrefix = 'ตัวแทน' + displayName;
+        options.push({ value: valueWithPrefix, text: displayName });
+      }
+    }
+    
+    console.log(`✅ getLongOptions: Loaded ${options.length - 1} agents`);
+    return { success: true, options: options };
+  } catch (e) {
+    console.error('❌ getLongOptions error:', e);
+    return { success: false, message: e.message, options: [{ value: "", text: "--- เลือกตัวแทนที่สังกัด ---" }] };
+  }
+}
 
 /* ========== HTML / UI Helpers ========== */
 function include(filename) {
