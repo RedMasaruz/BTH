@@ -153,11 +153,14 @@ function include(filename) {
 /**
  * Handle GET requests for API calls (e.g., from fetch)
  * Supports action parameter: getLongOptions
+ * Supports view parameter: trace (for QR Scans)
  */
 function doGet(e) {
-  const action = e.parameter.action;
+  const params = e.parameter;
+  const action = params.action;
+  const view = params.view;
   
-  // Handle API actions
+  // 1. API Actions
   if (action === 'getLongOptions') {
     try {
       const result = getLongOptions();
@@ -175,10 +178,52 @@ function doGet(e) {
     }
   }
   
+  // 2. Traceability View (QR Code Logic)
+  // Usage: <SCRIPT_URL>?view=trace&lotId=LOT-XXXX
+  if (view === 'trace') {
+    const lotId = params.lotId;
+    if (!lotId) return ContentService.createTextOutput("Lot ID is required").setMimeType(ContentService.MimeType.TEXT);
+    
+    // Fetch lot data
+    const lotData = getLotDataForTraceability(lotId);
+    if (!lotData) return ContentService.createTextOutput("Lot Not Found").setMimeType(ContentService.MimeType.TEXT);
+    
+    // Render simple HTML view
+    const template = HtmlService.createTemplateFromFile('traceability_view');
+    template.lot = lotData;
+    return template.evaluate()
+      .setTitle('BTH Traceability: ' + lotId)
+      .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+  }
+  
   // Default: serve the web app HTML
   return HtmlService.createHtmlOutputFromFile('index')
     .setTitle('BTH Traceability')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
+// Helper to get Lot Data
+function getLotDataForTraceability(lotId) {
+  try {
+     const sheet = getLotsSheet();
+     const data = sheet.getDataRange().getValues();
+     const headers = data[0];
+     const idxId = headers.indexOf('lot_id');
+     const idxData = headers.indexOf('data_json');
+     const idxHistory = headers.indexOf('history_json');
+     
+     for (let i = 1; i < data.length; i++) {
+       if (String(data[i][idxId]) === String(lotId)) {
+         const d = JSON.parse(data[i][idxData]);
+         const h = JSON.parse(data[i][idxHistory]);
+         return { id: lotId, data: d, history: h };
+       }
+     }
+     return null;
+  } catch (e) {
+    return null;
+  }
 }
 
 function doPost(e) {
@@ -783,7 +828,7 @@ function mapFarmerAgentToThai(val) {
   if (val === undefined || val === null) return '';
   const s = String(val).trim().toLowerCase();
   if (s === 'have' || s === 'have_agent' || s === 'มี' || s === 'มีตัวแทน') return 'มีตัวแทน';
-  if (s === 'none' || s === 'no' || s === 'ไม่ม���' || s === 'ยังไม่มีตัวแทน') return 'ยังไม่มีตัวแทน';
+  if (s === 'none' || s === 'no' || s === 'ไม่มี' || s === 'ยังไม่มีตัวแทน') return 'ยังไม่มีตัวแทน';
   return String(val);
 }
 
@@ -2311,10 +2356,17 @@ function updateLotState(lotId, newState, data, sessionToken) {
          riskFlags.push("Output > Input (Harvest -> Sort)");
        }
     }
+
+    // Special handling for SHIPPED state
+    if (newState === 'SHIPPED') {
+      // Could add specific shipping logic here (e.g., deduct form global inventory if it existed)
+      // For now, just ensuring shipping details are saved in updatedData (which they are)
+    }
     
     // Update Row
     sheet.getRange(rowIndex, idxState + 1).setValue(newState);
     sheet.getRange(rowIndex, idxData + 1).setValue(JSON.stringify(updatedData));
+    sheet.getRange(rowIndex, idxHistory + 1).setValue(JSON.stringify(history)); // Also save history!
     
     sheet.getRange(rowIndex, idxUpdated + 1).setValue(now);
     sheet.getRange(rowIndex, idxRiskScore + 1).setValue(riskScore);

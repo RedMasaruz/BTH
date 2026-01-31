@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <base target="_top">
+    <meta charset="utf-8">
+    <title>BTH Traceability Check</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background: #f0fdf4;
+            margin: 0;
+            padding: 20px;
+            color: #1f2937;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #f3f4f6;
+            padding-bottom: 16px;
+            margin-bottom: 16px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-weight: bold;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        .status-shipped {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-packed {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .label {
+            font-size: 12px;
+            color: #6b7280;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .value {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .timeline {
+            margin-top: 24px;
+            border-left: 2px solid #e5e7eb;
+            padding-left: 16px;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 20px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -21px;
+            top: 4px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+            border: 2px solid white;
+            box-shadow: 0 0 0 2px #e5e7eb;
+        }
+
+        .timeline-date {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        .timeline-title {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 12px;
+            color: #9ca3af;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <div class="header">
+            <img src="https://ui-avatars.com/api/?name=BTH&background=10b981&color=fff&size=64&rounded=true"
+                style="margin-bottom:12px;">
+            <h1 style="margin:0; font-size:20px;">ใบรับรองตรวจสอบย้อนกลับ</h1>
+            <p style="margin:4px 0 12px 0; font-size:14px; color:#4b5563;">Traceability Certificate</p>
+            <? var state = lot.data.current_state || 'UNKNOWN'; ?>
+            <? var stateClass = (state === 'SHIPPED') ? 'status-shipped' : 'status-packed'; ?>
+            <span class="status-badge <?= stateClass ?>">
+                <?= state ?>
+            </span>
+        </div>
+
+        <div class="grid">
+            <div>
+                <div class="label">Lot ID</div>
+                <div class="value">
+                    <?= lot.id ?>
+                </div>
+            </div>
+            <div>
+                <div class="label">สินค้า (Product)</div>
+                <div class="value">กระท่อม (Kratom) -
+                    <?= lot.data.species || 'ไม่ระบุ' ?>
+                </div>
+            </div>
+            <div>
+                <div class="label">เกษตรกรเจ้าของแปลง (Farmer)</div>
+                <div class="value">
+                    <?= lot.data.farmer_name || 'ไม่ระบุ' ?>
+                </div>
+            </div>
+            <div>
+                <div class="label">แหล่งปลูก (Origin)</div>
+                <div class="value">
+                    <?= lot.data.location || lot.data.district || '-' ?>
+                </div>
+            </div>
+            <? if (lot.data.shipping_tracking) { ?>
+            <div>
+                <div class="label">เลขพัสดุ (Tracking No.)</div>
+                <div class="value">
+                    <?= lot.data.shipping_tracking ?>
+                </div>
+            </div>
+            <? } ?>
+        </div>
+
+        <div class="timeline">
+            <h3 style="font-size:16px; margin:0 0 16px 0;">ประวัติการผลิต (Production History)</h3>
+            <? 
+        if (lot.history && lot.history.length > 0) {
+          for (var i = 0; i < lot.history.length; i++) {
+            var event = lot.history[i];
+            var date = new Date(event.timestamp);
+      ?>
+            <div class="timeline-item">
+                <div class="timeline-title">
+                    <?= event.state ?>
+                </div>
+                <div class="timeline-date">
+                    <?= date.toLocaleString('th-TH') ?>
+                </div>
+            </div>
+            <? 
+          }
+        } 
+      ?>
+        </div>
+    </div>
+    <div class="footer">
+        BTH Center Traceability System © 2026
+    </div>
+</body>
+
+</html>
