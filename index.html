@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <!-- Updated viewport to include safe-area for iOS devices -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Traceability - BTH</title>
+    <title>BTH Traceability</title>
 
     <!-- PWA Meta Tags -->
     <meta name="description" content="ระบบบันทึกและติดตามข้อมูลเกษตรกร - บริษัท บ้านไทยเฮิร์บเซ็นเตอร์ จำกัด">
@@ -8547,6 +8547,36 @@
                      <div>
                         <label class="block text-sm font-medium mb-1">ผู้ควบคุม</label>
                         <input type="text" name="grinding_operator" required class="w-full border rounded p-2" placeholder="ระบุชื่อ">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium mb-1">ความละเอียด (Mesh Size)</label>
+                        <div class="space-y-3">
+                             <!-- Coarse Option -->
+                             <label class="flex items-center p-3 border rounded-lg bg-green-50 border-green-200 cursor-pointer hover:bg-green-100 transition-colors">
+                                <input type="radio" name="grinding_mesh_size" value="20-40" required class="h-4 w-4 text-green-600 focus:ring-green-500">
+                                <span class="ml-2 font-bold text-green-800">บดหยาบ (20-40 mesh)</span>
+                             </label>
+                             
+                             <!-- Fine Options Group -->
+                             <div class="border rounded-lg p-3 relative">
+                                <span class="absolute -top-3 left-3 bg-white px-2 text-xs font-bold text-gray-500">บดผง (Fine Powder)</span>
+                                <div class="grid grid-cols-1 gap-2 mt-1">
+                                    <label class="flex items-center p-2 rounded hover:bg-gray-50 cursor-pointer">
+                                        <input type="radio" name="grinding_mesh_size" value="100" class="h-4 w-4 text-gray-600 focus:ring-green-500">
+                                        <span class="ml-2 text-gray-700">100 mesh</span>
+                                    </label>
+                                    <label class="flex items-center p-2 rounded hover:bg-gray-50 cursor-pointer">
+                                        <input type="radio" name="grinding_mesh_size" value="120-200" class="h-4 w-4 text-gray-600 focus:ring-green-500">
+                                        <span class="ml-2 text-gray-700">120-200 mesh</span>
+                                    </label>
+                                    <label class="flex items-center p-2 rounded hover:bg-gray-50 cursor-pointer">
+                                        <input type="radio" name="grinding_mesh_size" value="300+" class="h-4 w-4 text-gray-600 focus:ring-green-500">
+                                        <span class="ml-2 text-gray-700">300 mesh+</span>
+                                    </label>
+                                </div>
+                             </div>
+                        </div>
                     </div>
                     
                     <div>
