@@ -150,6 +150,37 @@ function include(filename) {
   return HtmlService.createHtmlOutputFromFile(filename).getContent();
 }
 
+/**
+ * Handle GET requests for API calls (e.g., from fetch)
+ * Supports action parameter: getLongOptions
+ */
+function doGet(e) {
+  const action = e.parameter.action;
+  
+  // Handle API actions
+  if (action === 'getLongOptions') {
+    try {
+      const result = getLongOptions();
+      return ContentService
+        .createTextOutput(JSON.stringify(result))
+        .setMimeType(ContentService.MimeType.JSON);
+    } catch (error) {
+      return ContentService
+        .createTextOutput(JSON.stringify({
+          success: false,
+          message: error.message,
+          options: [{ value: "", text: "--- เกิดข้อผิดพลาด ---" }]
+        }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+  }
+  
+  // Default: serve the web app HTML
+  return HtmlService.createHtmlOutputFromFile('index')
+    .setTitle('BTH Traceability')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
 function doPost(e) {
   try {
     const params = e.parameter;

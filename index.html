@@ -2224,6 +2224,7 @@
 
         /**
          * Fetch agent options from backend (Google Sheet)
+         * Supports both google.script.run (Apps Script) and fetch API (GitHub Pages)
          * @returns {Promise} Resolves when options are loaded
          */
         async function fetchLongOptionsFromBackend() {
@@ -2235,7 +2236,25 @@
             console.log('🔄 Fetching LONG_OPTIONS from backend...');
 
             try {
-                // Check if google.script.run is available
+                // Try using fetch API first (works for both GitHub Pages and Apps Script)
+                if (BACKEND_URL) {
+                    try {
+                        const response = await fetch(`${BACKEND_URL}?action=getLongOptions`);
+                        const result = await response.json();
+
+                        if (result && result.success && result.options) {
+                            LONG_OPTIONS = result.options;
+                            longOptionsLoaded = true;
+                            console.log(`✅ Loaded ${LONG_OPTIONS.length} agent options via fetch`);
+                            populateLongOptions('.long-affiliation');
+                            return;
+                        }
+                    } catch (fetchError) {
+                        console.warn('⚠️ Fetch failed, trying google.script.run...', fetchError);
+                    }
+                }
+
+                // Fallback to google.script.run if available
                 if (typeof google !== 'undefined' && google.script && google.script.run) {
                     return new Promise((resolve, reject) => {
                         google.script.run
@@ -2243,12 +2262,11 @@
                                 if (result && result.success && result.options) {
                                     LONG_OPTIONS = result.options;
                                     longOptionsLoaded = true;
-                                    console.log(`✅ Loaded ${LONG_OPTIONS.length} agent options from backend`);
-                                    // Re-populate dropdowns after loading
+                                    console.log(`✅ Loaded ${LONG_OPTIONS.length} agent options from google.script.run`);
                                     populateLongOptions('.long-affiliation');
                                     resolve();
                                 } else {
-                                    console.error('❌ Failed to load agent options from backend');
+                                    console.error('❌ Failed to load agent options');
                                     LONG_OPTIONS = [{ value: "", text: "--- ไม่สามารถโหลดข้อมูลได้ ---" }];
                                     populateLongOptions('.long-affiliation');
                                     resolve();
@@ -2263,9 +2281,8 @@
                             .getLongOptions();
                     });
                 } else {
-                    // Running externally without backend
-                    console.warn('⚠️ google.script.run not available');
-                    LONG_OPTIONS = [{ value: "", text: "--- ต้องใช้งานผ่าน Google Apps Script ---" }];
+                    console.error('❌ No backend available');
+                    LONG_OPTIONS = [{ value: "", text: "--- ไม่สามารถเชื่อมต่อ backend ---" }];
                     populateLongOptions('.long-affiliation');
                 }
             } catch (e) {
