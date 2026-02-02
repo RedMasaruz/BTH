@@ -219,11 +219,6 @@ function doGet(e) {
         .setMimeType(ContentService.MimeType.JSON);
     }
   }
-
-  if (action === 'migrate_data') {
-      const result = convertAllLegacyDataToReadable();
-      return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
-  }
   
   // 2. Traceability View (QR Code Logic)
   // Usage: <SCRIPT_URL>?view=trace&lotId=LOT-XXXX
@@ -2877,55 +2872,6 @@ function getFarmersWithSheetBRecords(longName, sessionToken) {
     Logger.log('getFarmersWithSheetBRecords error: ' + e.message);
     return { success: false, message: e.message };
   }
-}
-
-/**
- * MIGRATION TOOL: Convert all legacy JSON data in columns to readable format
- * Run this function once manually or via Admin UI
- */
-function convertAllLegacyDataToReadable() {
-  const ss = SpreadsheetApp.openById(SPREADSHEET_ID_A);
-  const sheet = ss.getSheetByName(SHEET_NAME);
-  if (!sheet) return { success: false, message: "Sheet not found" };
-  
-  const data = sheet.getDataRange().getValues();
-  const headers = data[0];
-  
-  // Identify Columns
-  const cols = [
-      { name: 'รายละเอียดการเก็บเกี่ยว', state: 'HARVESTED' },
-      { name: 'รายละเอียดการรับซื้อ', state: 'RECEIVED' },
-      { name: 'รายละเอียดการคัดแยก', state: 'SORTED' },
-      { name: 'รายละเอียดการทำความสะอาด', state: 'CLEANED' },
-      { name: 'รายละเอียดการอบ', state: 'DRIED' },
-      { name: 'รายละเอียดการบด', state: 'GROUND' },
-      { name: 'รายละเอียดการบรรจุ', state: 'PACKED' },
-      { name: 'รายละเอียดการส่ง', state: 'SHIPPED' }
-  ];
-  
-  let updates = 0;
-  
-  cols.forEach(col => {
-      const idx = headers.indexOf(col.name);
-      if (idx !== -1) {
-          for (let i = 1; i < data.length; i++) {
-              const cellVal = data[i][idx];
-              // Check if it looks like JSON (starts with { and ends with })
-              if (cellVal && typeof cellVal === 'string' && cellVal.trim().startsWith('{') && cellVal.trim().endsWith('}')) {
-                  try {
-                      const json = JSON.parse(cellVal);
-                      const readable = formatDataForSheet(col.state, json);
-                      sheet.getRange(i + 1, idx + 1).setValue(readable);
-                      updates++;
-                  } catch (e) {
-                      // Ignore invalid JSON
-                  }
-              }
-          }
-      }
-  });
-  
-  return { success: true, message: `Updated ${updates} cells to readable format.` };
 }
 
 /**

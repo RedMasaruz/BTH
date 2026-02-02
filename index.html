@@ -1996,11 +1996,6 @@
                         </div>
                     </div>
 
-                    <!-- System Tools Injection Point -->
-                    <div id="ad-prod-tools" class="mb-6 animate-in fade-in slide-in-from-top-4 duration-500"></div>
-
-
-
                     <!-- Charts / Breakdown -->
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
@@ -9372,20 +9367,6 @@
             document.getElementById('ad-prod-completed').innerText = completed;
             document.getElementById('ad-prod-risk').innerText = risk;
 
-            // System Tools
-            const toolsContainer = document.getElementById('ad-prod-tools');
-            if (toolsContainer) {
-                toolsContainer.innerHTML = `
-                    <div class="mt-4 p-4 bg-yellow-50 rounded-xl border border-yellow-200">
-                        <h4 class="font-bold text-yellow-800 mb-2">เครื่องมือผู้ดูแลระบบ (System Maintenance)</h4>
-                        <button onclick="runDataMigration()" class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 font-bold text-sm shadow">
-                            🛠️ แปลงข้อมูลเก่าให้อ่านง่าย (Fix Legacy Data)
-                        </button>
-                        <p class="text-xs text-yellow-600 mt-2">* กดปุ่มนี้เพื่อแปลงข้อมูล JSON ในตารางให้เป็นข้อความภาษาไทย (ทำครั้งเทียว)</p>
-                    </div>
-                `;
-            }
-
             // 2. State Breakdown
             const counts = {};
             STATE_FLOW.forEach(s => counts[s] = 0);
@@ -9488,37 +9469,6 @@
             }
             html += '</div>';
             container.innerHTML = html;
-        }
-
-        async function runDataMigration() {
-            if (!confirm('คุณต้องการแปลงข้อมูล JSON เก่าทั้งหมดให้เป็นภาษาไทยหรือไม่?\\n\\nการดำเนินการนี้จะแก้ไขข้อมูลใน Google Sheets โดยตรง\\nแนะนำให้ทำเมื่อไม่ได้มีการใช้งานหนัก')) return;
-
-            // Find existing loading spinner or use custom alert
-            const btn = document.querySelector('button[onclick="runDataMigration()"]');
-            const originalText = btn ? btn.innerText : '';
-            if (btn) { btn.innerText = '⏳ กำลังทำงาน...'; btn.disabled = true; }
-
-            try {
-                google.script.run
-                    .withSuccessHandler(res => {
-                        if (btn) { btn.innerText = originalText; btn.disabled = false; }
-                        if (res.success) {
-                            showCustomAlert('สำเร็จ! ' + res.message, 'success');
-                            // Reload dashboard if function exists
-                            if (typeof adminInitProductionDashboard === 'function') adminInitProductionDashboard();
-                        } else {
-                            showCustomAlert('ล้มเหลว: ' + res.message, 'danger');
-                        }
-                    })
-                    .withFailureHandler(err => {
-                        if (btn) { btn.innerText = originalText; btn.disabled = false; }
-                        showCustomAlert('Server Error: ' + err.message, 'danger');
-                    })
-                    .convertAllLegacyDataToReadable(); // Call backend function
-            } catch (e) {
-                if (btn) { btn.innerText = originalText; btn.disabled = false; }
-                showCustomAlert('Error: ' + e.message, 'danger');
-            }
         }
 
     </script>
