@@ -2465,7 +2465,7 @@ function updateLotState(lotId, newState, data, sessionToken) {
         const idxTarget = getIdx(targetCol);
         const idxTargetDate = getIdx(targetDateCol);
         
-        if (idxTarget !== -1) sheet.getRange(rowIndex, idxTarget + 1).setValue(JSON.stringify(data));
+        if (idxTarget !== -1) sheet.getRange(rowIndex, idxTarget + 1).setValue(formatThaiLogDetails(newState, data));
         if (idxTargetDate !== -1) sheet.getRange(rowIndex, idxTargetDate + 1).setValue(now);
     }
     
@@ -2508,6 +2508,37 @@ function updateLotState(lotId, newState, data, sessionToken) {
  * @param {Object} data - Contains lot_ids array and cleaning data
  * @param {string} sessionToken - The session token
  */
+// Helper to Format Log Data to Readable Thai Text
+function formatThaiLogDetails(state, data) {
+    if (!data) return "-";
+    let text = "";
+    
+    if (state === 'PACKED') {
+        text = `บรรจุ: ${data.packing_qty || '-'} ${data.packing_format || '-'}`;
+        if (data.packing_quality_note) text += `, Note: ${data.packing_quality_note}`;
+    } else if (state === 'SORTED') {
+        text = `ผ่าน: ${data.sorting_bags_pass || 0} ถุง, ตกเกรด: ${data.sorting_bags_fail || 0} ถุง (${data.sorting_fail_action || '-'})`;
+        if (data.sorting_operator) text += `, ผู้คุม: ${data.sorting_operator}`;
+    } else if (state === 'CLEANED') {
+        text = `วิธี: ${data.cleaning_method || '-'}, สะอาด: ${data.cleaning_quality_pass === 'yes' ? 'ผ่าน' : 'ไม่ผ่าน'}`;
+        if (data.cleaning_operator) text += `, ผู้คุม: ${data.cleaning_operator}`;
+    } else if (state === 'DRIED') {
+        text = `อุณหภูมิ: ${data.drying_temp || '-'}°C, ความชื้น: ${data.drying_moisture || '-'}%`;
+         if (data.drying_operator) text += `, ผู้คุม: ${data.drying_operator}`;
+    } else if (state === 'GROUND') {
+        text = `เบอร์: ${data.grinding_mesh_size || '-'}, นน.ผง: ${data.qty_powder || '-'} กก.`;
+    } else if (state === 'SHIPPED') {
+        text = `ลูกค้า: ${data.shipping_customer || '-'}, ขนส่ง: ${data.shipping_carrier || '-'}, Tracking: ${data.shipping_tracking || '-'}`;
+    } else if (state === 'RECEIVED' || state === 'HARVESTED') {
+        text = `ปริมาณ: ${data.qty_harvested || '-'} กก., รับ/เก็บ: ${data.farmer_name || '-'}`;
+    } else {
+        // Fallback to simpler JSON extraction if possible, or just -
+        text = JSON.stringify(data);
+    }
+    
+    return text;
+}
+
 function updateMultipleLotState(data, sessionToken) {
   try {
     const session = validateSessionToken(sessionToken);
