@@ -3,7 +3,8 @@ const CACHE_NAME = 'bth-farmer-v1';
 const urlsToCache = [
   './',
   './index.html',
-  './manifest.json'
+  './manifest.json',
+  './thai_address_db.js'
 ];
 
 // Install event - cache essential resources
@@ -94,7 +95,7 @@ self.addEventListener('fetch', (event) => {
               console.log('[Service Worker] Serving from cache:', event.request.url);
               return response;
             }
-            
+
             // If not in cache and offline, return a basic offline page for navigation requests
             if (event.request.mode === 'navigate') {
               return new Response(

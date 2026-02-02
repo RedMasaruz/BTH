@@ -2465,7 +2465,7 @@ function updateLotState(lotId, newState, data, sessionToken) {
         const idxTarget = getIdx(targetCol);
         const idxTargetDate = getIdx(targetDateCol);
         
-        if (idxTarget !== -1) sheet.getRange(rowIndex, idxTarget + 1).setValue(formatDataForSheet(newState, data));
+        if (idxTarget !== -1) sheet.getRange(rowIndex, idxTarget + 1).setValue(JSON.stringify(data));
         if (idxTargetDate !== -1) sheet.getRange(rowIndex, idxTargetDate + 1).setValue(now);
     }
     
@@ -2648,7 +2648,7 @@ function updateMultipleLotState(data, sessionToken) {
     
     // Save Cleaning Data Details
     setVal('วันที่ทำความสะอาด', now); // Thai
-    setVal('รายละเอียดการทำความสะอาด', formatDataForSheet('CLEANED', combinedData)); // Thai
+    setVal('รายละเอียดการทำความสะอาด', JSON.stringify(combinedData)); // Thai
     
     // Save Combined Flag
     setVal('เป็นการรวมLot', true); // Thai
@@ -2874,55 +2874,3 @@ function getFarmersWithSheetBRecords(longName, sessionToken) {
   }
 }
 
-/**
- * Format data object into human-readable string for Sheet columns
- */
-function formatDataForSheet(state, data) {
-    if (!data) return "-";
-    let parts = [];
-    
-    switch(state) {
-        case 'HARVESTED':
-            if(data.qty_harvested) parts.push(`เก็บเกี่ยว: ${data.qty_harvested} กก.`);
-            if(data.location) parts.push(`สถานที่: ${data.location}`);
-            break;
-        case 'RECEIVED':
-             if(data.qty_harvested) parts.push(`รับซื้อ: ${data.qty_harvested} กก.`);
-             if(data.farmer_name) parts.push(`จาก: ${data.farmer_name}`);
-             break;
-        case 'SORTED':
-             parts.push(`ผ่าน: ${data.sorting_bags_pass || 0}, ไม่ผ่าน: ${data.sorting_bags_fail || 0}`);
-             if(data.qty_sorted_remaining) parts.push(`คงเหลือ: ${data.qty_sorted_remaining} กก.`);
-             if(data.sorting_operator) parts.push(`ผู้คัด: ${data.sorting_operator}`);
-             break;
-        case 'CLEANED':
-             if(data.cleaning_method) parts.push(`วิธี: ${data.cleaning_method}`);
-             if(data.cleaning_operator) parts.push(`ผู้ทำ: ${data.cleaning_operator}`);
-             break;
-        case 'DRIED':
-             if(data.drying_technique) parts.push(`เทคนิค: ${data.drying_technique}`);
-             if(data.moisture_content) parts.push(`ความชื้น: ${data.moisture_content}%`);
-             if(data.drying_temp) parts.push(`อุณหภูมิ: ${data.drying_temp}°C`);
-             break;
-        case 'GROUND':
-             if(data.grinding_mesh_size) parts.push(`เบอร์ตะแกรง: ${data.grinding_mesh_size}`);
-             if(data.qty_ground_output) parts.push(`ผลลัพธ์: ${data.qty_ground_output} กก.`);
-             break;
-        case 'PACKED':
-             if(data.packing_format) parts.push(`รูปแบบ: ${data.packing_format}`);
-             if(data.packing_qty) parts.push(`จำนวน: ${data.packing_qty}`);
-             break;
-        case 'SHIPPED':
-             if(data.shipping_customer) parts.push(`ลูกค้า: ${data.shipping_customer}`);
-             if(data.shipping_carrier) parts.push(`ขนส่ง: ${data.shipping_carrier}`);
-             if(data.shipping_tracking) parts.push(`Tracking: ${data.shipping_tracking}`);
-             break;
-    }
-    
-    // Fallback if parts empty but data exists
-    if (parts.length === 0 && Object.keys(data).length > 0) {
-        return JSON.stringify(data); 
-    }
-    
-    return parts.join(', ');
-}
