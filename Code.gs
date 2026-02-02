@@ -2383,12 +2383,8 @@ function updateLotState(lotId, newState, data, sessionToken) {
     // Find Header Indices dynamically
     const getIdx = (name) => headers.indexOf(name);
     
-    const idxState = getIdx('state');
-    const idxData = getIdx('data_json'); // Legacy
-    const idxHistory = getIdx('history_json');
-    const idxUpdated = getIdx('updated_at');
-    const idxRiskScore = getIdx('risk_score');
-    const idxRiskFlags = getIdx('risk_flags');
+    // (Removed redundant declarations)
+
     
     // Current Data (Legacy approach + new approach mix)
     // We primarily rely on legacy JSON for full state current object, 
