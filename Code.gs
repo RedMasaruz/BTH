@@ -2478,13 +2478,7 @@ function updateMultipleLotState(data, sessionToken) {
     const values = dataRange.getValues();
     const headers = values[0];
     
-    const idxId = headers.indexOf('lot_id');
-    const idxState = headers.indexOf('state');
-    const idxAgentId = headers.indexOf('agent_id');
-    const idxFarmerId = headers.indexOf('farmer_id');
-    const idxData = headers.indexOf('data_json');
-    const idxHistory = headers.indexOf('history_json');
-    const idxUpdated = headers.indexOf('updated_at');
+    // (Removed redundant declarations)
     
     const now = new Date();
     
