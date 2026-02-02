@@ -8450,16 +8450,26 @@
                          </div>
                          <div>
                              <label class="block text-sm font-medium mb-1">ถุงที่ตรวจ (ไม่ผ่าน)</label>
-                             <input type="number" name="sorting_bags_fail" required min="0" class="w-full border rounded p-2">
+                             <input type="number" name="sorting_bags_fail" required min="0" class="w-full border rounded p-2" 
+                                oninput="const el = document.getElementById('sorting-defect-actions'); if(!this.value || parseInt(this.value) <= 0) { el.style.display = 'none'; } else { el.style.display = 'block'; }">
                          </div>
                     </div>
                     
-                    <div>
-                        <label class="block text-sm font-medium mb-1">การจัดการของไม่ผ่าน</label>
-                        <div class="flex gap-4">
-                             <label class="flex items-center gap-1"><input type="radio" name="sorting_fail_action" value="destroy" checked> ทำลาย</label>
-                             <label class="flex items-center gap-1"><input type="radio" name="sorting_fail_action" value="use"> แยกใช้</label>
-                             <label class="flex items-center gap-1"><input type="radio" name="sorting_fail_action" value="return"> ส่งคืน</label>
+                    <div id="sorting-defect-actions" style="display: none;" class="transition-all duration-300">
+                        <label class="block text-sm font-medium mb-1 text-red-700">การจัดการของที่ตรวจไม่ผ่าน</label>
+                        <div class="flex gap-4 p-3 bg-red-50 border border-red-100 rounded">
+                             <label class="flex items-center gap-2 cursor-pointer hover:text-red-800">
+                                <input type="radio" name="sorting_fail_action" value="destroy" class="accent-red-600" checked> 
+                                <span>ทำลาย</span>
+                             </label>
+                             <label class="flex items-center gap-2 cursor-pointer hover:text-red-800">
+                                <input type="radio" name="sorting_fail_action" value="use" class="accent-red-600"> 
+                                <span>แยกใช้</span>
+                             </label>
+                             <label class="flex items-center gap-2 cursor-pointer hover:text-red-800">
+                                <input type="radio" name="sorting_fail_action" value="return" class="accent-red-600"> 
+                                <span>ส่งคืน</span>
+                             </label>
                         </div>
                     </div>
                     
@@ -8561,11 +8571,11 @@
                      <div class="grid grid-cols-2 gap-4">
                         <div>
                              <label class="block text-sm font-medium mb-1">เวลาเริ่มอบ</label>
-                             <input type="datetime-local" name="drying_start_time" required class="w-full border rounded p-2">
+                             <input type="datetime-local" name="drying_start_time" required class="w-full border rounded p-2" onclick="try{this.showPicker()}catch(e){}">
                         </div>
                         <div>
                              <label class="block text-sm font-medium mb-1">เวลาจบอบ</label>
-                             <input type="datetime-local" name="drying_end_time" required class="w-full border rounded p-2">
+                             <input type="datetime-local" name="drying_end_time" required class="w-full border rounded p-2" onclick="try{this.showPicker()}catch(e){}">
                         </div>
                     </div>
                     
