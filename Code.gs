@@ -2902,3 +2902,90 @@ function getFarmersWithSheetBRecords(longName, sessionToken) {
   }
 }
 
+
+/* ========== BACKUP SYSTEM ========== */
+
+/**
+ * Get or create the main backup folder "BTH_Backups" in the root directory.
+ * @returns {Folder} The Google Drive folder object.
+ */
+function getOrCreateBackupFolder() {
+  const folders = DriveApp.getFoldersByName("BTH_Backups");
+  if (folders.hasNext()) {
+    return folders.next();
+  } else {
+    return DriveApp.createFolder("BTH_Backups");
+  }
+}
+
+/**
+ * Create a daily backup of key spreadsheets.
+ * 1. Creates a subfolder with today's date (YYYY-MM-DD) inside "BTH_Backups".
+ * 2. Copies the Main Sheet, Sheet B, GACP, and Survey Sheet into that subfolder.
+ * 3. Appends timestamp to copied filenames.
+ * 4. Logs the result to the AuditLog.
+ */
+function createDailyBackup() {
+  const backupRoot = getOrCreateBackupFolder();
+  const today = new Date();
+  const dateStr = Utilities.formatDate(today, Session.getScriptTimeZone(), "yyyy-MM-dd");
+  
+  // Check if daily folder exists, else create
+  let dailyFolder;
+  const subFolders = backupRoot.getFoldersByName(dateStr);
+  if (subFolders.hasNext()) {
+    dailyFolder = subFolders.next();
+  } else {
+    dailyFolder = backupRoot.createFolder(dateStr);
+  }
+
+  const timestamp = Utilities.formatDate(today, Session.getScriptTimeZone(), "HH-mm");
+
+  const sheetsToBackup = [
+    { id: SPREADSHEET_ID_A, name: "Main_Database" },
+    { id: SPREADSHEET_ID_B, name: "Sheet_B_Data" },
+    { id: SPREADSHEET_ID_GACP, name: "GACP_Database" },
+    { id: SURVEY_SPREADSHEET_ID, name: "Survey_Data" }
+  ];
+
+  const results = [];
+
+  sheetsToBackup.forEach(item => {
+    try {
+      const file = DriveApp.getFileById(item.id);
+      file.makeCopy(`${item.name}_Backup_${dateStr}_${timestamp}`, dailyFolder);
+      results.push(`${item.name} OK`);
+    } catch (e) {
+      console.error(`Backup failed for ${item.name}: ${e.message}`);
+      results.push(`${item.name} FAILED`);
+    }
+  });
+
+  // Log action
+  logAction("System Backup", "System", { status: "Completed", details: results, folder: dailyFolder.getUrl() });
+  console.log(`Backup completed: ${results.join(", ")}`);
+}
+
+/**
+ * Setup function: Creates a daily trigger to run the backup at 01:00 AM.
+ * Run this function ONCE manually to initialize the schedule.
+ */
+function setupDailyBackupTrigger() {
+  // Clear existing triggers to avoid duplicates
+  const triggers = ScriptApp.getProjectTriggers();
+  for (let i = 0; i < triggers.length; i++) {
+    if (triggers[i].getHandlerFunction() === 'createDailyBackup') {
+      ScriptApp.deleteTrigger(triggers[i]);
+    }
+  }
+
+  // Create new trigger for 01:00 AM
+  ScriptApp.newTrigger('createDailyBackup')
+    .timeBased()
+    .everyDays(1)
+    .atHour(1)
+    .create();
+
+  console.log("Daily backup trigger set for 01:00 AM.");
+  return "Backup trigger set successfully.";
+}
