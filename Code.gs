@@ -1762,7 +1762,7 @@ function submitForm(data, token) {
     try { logAction('submitForm', data.coordinator_name || data.agent_name || 'anonymous', { farmer: data.farmer_name_main, row: lastRow }); } catch (e) {}
 
     // สร้าง preview PDF (unchanged)
-    // const pdfInfo = generatePreviewPdf(data);
+    const pdfInfo = generatePreviewPdf(data);
 
     return `บันทึกข้อมูลเรียบร้อยแล้ว (แถวที่ ${lastRow})`;
   } catch (error) {
