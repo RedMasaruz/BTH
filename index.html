@@ -6001,7 +6001,7 @@
                                     showMessageBox('❌ เกิดข้อผิดพลาด', err.message);
                                     reject(err);
                                 })
-                                .processForm(document.getElementById('kratomForm'), token); // Assuming processForm is the backend function
+                                .submitForm(document.getElementById('kratomForm'), token); // Assuming processForm is the backend function
                         });
                     });
                 });
