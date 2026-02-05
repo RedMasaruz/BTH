@@ -1472,14 +1472,17 @@
                         <div>
                             <label for="b-long-affiliation-use"
                                 class="block text-sm font-medium mb-1">ตัวแทนที่สังกัด</label>
-                            <select id="b-long-affiliation-use" required class="w-full">
+                            <select id="b-long-affiliation-use" required class="w-full"
+                                onchange="loadFarmersForUsageForm()">
                                 <option value="" disabled selected>--- เลือกตัวแทนที่สังกัด ---</option>
                             </select>
                         </div>
                         <div>
                             <label for="b-farmer-id-use" class="block text-sm font-medium mb-1">รหัสเกษตรกร<span
-                                    class="text-red-500">(ใช้รหัสที่ตัวแทนกำหนดให้เท่านั้น)</span></label>
-                            <input type="text" id="b-farmer-id-use" placeholder="(Farmer ID)" required class="w-full">
+                                    class="text-green-600"> (จากฐานข้อมูลตัวแทน)</span></label>
+                            <select id="b-farmer-id-use" required class="w-full">
+                                <option value="" disabled selected>--- กรุณาเลือกตัวแทนก่อน ---</option>
+                            </select>
                         </div>
                     </div>
 
@@ -8367,6 +8370,71 @@
                     </div>
                 </form>
              `;
+        }
+
+        function loadFarmersForUsageForm() {
+            const longSelect = document.getElementById('b-long-affiliation-use');
+            const farmerSelect = document.getElementById('b-farmer-id-use');
+            const nameInput = document.getElementById('b-fullname-use');
+            const token = sessionStorage.getItem('sessionToken');
+            const longName = longSelect ? longSelect.value : '';
+
+            if (!longName) {
+                if (farmerSelect) {
+                    farmerSelect.innerHTML = '<option value="" disabled selected>--- กรุณาเลือกตัวแทนก่อน ---</option>';
+                }
+                return;
+            }
+
+            if (farmerSelect) {
+                farmerSelect.innerHTML = '<option value="">กำลังโหลด...</option>';
+            }
+
+            google.script.run
+                .withSuccessHandler(result => {
+                    let data;
+                    try {
+                        data = typeof result === 'string' ? JSON.parse(result) : result;
+                    } catch (e) {
+                        data = result;
+                    }
+
+                    if (farmerSelect) {
+                        farmerSelect.innerHTML = '<option value="" disabled selected>--- เลือกเกษตรกร ---</option>';
+
+                        if (data && data.success && Array.isArray(data.data) && data.data.length > 0) {
+                            data.data.forEach(f => {
+                                const farmerId = f['รหัสเกษตรกร'] || f['a-id'] || '';
+                                const farmerName = f['ชื่อ-นามสกุล'] || f['a-fullname'] || farmerId;
+
+                                if (farmerId) {
+                                    const opt = document.createElement('option');
+                                    opt.value = farmerId;
+                                    opt.textContent = `${farmerName} (${farmerId})`;
+                                    opt.dataset.name = farmerName;
+                                    farmerSelect.appendChild(opt);
+                                }
+                            });
+
+                            // Auto-fill name when farmer is selected
+                            farmerSelect.onchange = function () {
+                                const selectedOpt = this.options[this.selectedIndex];
+                                if (nameInput && selectedOpt && selectedOpt.value) {
+                                    nameInput.value = selectedOpt.dataset.name || '';
+                                }
+                            };
+                        } else {
+                            farmerSelect.innerHTML = '<option value="">ไม่พบเกษตรกรที่ลงทะเบียน</option>';
+                        }
+                    }
+                })
+                .withFailureHandler(e => {
+                    console.error('loadFarmersForUsageForm error:', e);
+                    if (farmerSelect) {
+                        farmerSelect.innerHTML = '<option value="">โหลดล้มเหลว</option>';
+                    }
+                })
+                .getAllFarmersByLong(longName, token);
         }
 
         function populateFarmersDropdownForDelivery(selectId) {
