@@ -2,9 +2,10 @@
 const CACHE_NAME = 'bth-farmer-v1';
 const urlsToCache = [
   './',
-  './index.html',
-  './manifest.json',
-  './thai_address_db.js'
+  './frontend/index.html',
+  './public/manifest.json',
+  './frontend/assets/thai_address_db.js',
+  './frontend/assets/style.css'
 ];
 
 // Install event - cache essential resources

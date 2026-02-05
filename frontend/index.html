@@ -6976,7 +6976,8 @@
         // =============================================
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('../public/sw.js', { scope: './' })
+                // Register Service Worker from root directory
+                navigator.serviceWorker.register('../sw.js', { scope: '../' })
                     .then(registration => {
                         console.log('✅ Service Worker registered successfully:', registration.scope);
 
