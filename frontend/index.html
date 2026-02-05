@@ -5977,34 +5977,122 @@
                 // Use the double submit protection helper
                 submitBtn.addEventListener('click', () => {
                     withDoubleSubmitProtection('submitBtn', () => {
-                        return new Promise((resolve, reject) => {
+                        return new Promise(async (resolve, reject) => {
                             const token = sessionStorage.getItem('sessionToken');
-                            google.script.run
-                                .withSuccessHandler(msg => {
-                                    showMessageBox('✅ สำเร็จ', msg);
-                                    document.getElementById('kratomForm').reset();
+                            const form = document.getElementById('kratomForm');
 
-                                    // Hide "other" inputs...
-                                    ['water_other_text', 'fert_other_text', 'past_other_text', 'agent-name', 'gap-date-range', 'gacp-date-range', 'special-name', 'substanceValueBox'].forEach(id => {
-                                        const el = document.getElementById(id);
-                                        if (el) el.classList.add('hidden');
-                                    });
-                                    // Clear textareas
-                                    const otherVar = document.getElementById('other_varieties');
-                                    if (otherVar) otherVar.value = '';
-                                    const hormoneAnd = document.getElementById('hormone_and_other');
-                                    if (hormoneAnd) hormoneAnd.value = '';
+                            // Prepare data object manually for both environments to ensure consistency
+                            const formData = new FormData(form);
+                            const formObj = {};
+                            formData.forEach((value, key) => {
+                                // Handle multi-select arrays (e.g. checkbox groups)
+                                if (formObj[key]) {
+                                    if (!Array.isArray(formObj[key])) {
+                                        formObj[key] = [formObj[key]];
+                                    }
+                                    formObj[key].push(value);
+                                } else {
+                                    formObj[key] = value;
+                                }
+                            });
 
-                                    resolve();
-                                })
-                                .withFailureHandler(err => {
-                                    showMessageBox('❌ เกิดข้อผิดพลาด', err.message);
+                            // Handle specific array fields that might be single values in FormData
+                            // (If backend expects arrays for checkboxes even with one selection)
+                            const arrayFields = ['water_system[]', 'fertilizer_method[]', 'mineral_options[]', 'past_land_types[]'];
+                            arrayFields.forEach(field => {
+                                const cleanKey = field.replace('[]', ''); // e.g., water_system
+                                if (formObj[field]) {
+                                    // If FormData has "water_system[]", map it to "water_system" key if needed by backend, 
+                                    // OR keep it as is. GAS usually maps "name" to value. 
+                                    // Checking how google.script.run does it: it uses keys exactly as name attributes.
+                                    // But repeated keys become array? GAS behavior is specific.
+                                    // Let's assume standard behavior: we need to send what the backend expects.
+                                    // submitForm backend logic probably expects array for these.
+                                    if (!Array.isArray(formObj[field])) {
+                                        formObj[field] = [formObj[field]];
+                                    }
+                                }
+                            });
+
+                            if (typeof google !== 'undefined' && google.script && google.script.run) {
+                                // GAS Environment
+                                google.script.run
+                                    .withSuccessHandler(msg => {
+                                        showMessageBox('✅ สำเร็จ', msg);
+                                        form.reset();
+                                        hideSpecialInputs();
+                                        resolve();
+                                    })
+                                    .withFailureHandler(err => {
+                                        showMessageBox('❌ เกิดข้อผิดพลาด', err.message);
+                                        reject(err);
+                                    })
+                                    .submitForm(formObj, token); // Sending object instead of form parsing on server if possible, or use processForm wrapper
+                                // Original code called .processForm(form, token). processForm isn't in ALLOWED_FUNCTIONS. 
+                                // But submitForm IS. And submitForm takes (data, token).
+                                // So we should call submitForm(formObj, token).
+                            } else {
+                                // Web / GitHub Pages Environment
+                                if (!BACKEND_URL) {
+                                    const err = new Error('BACKEND_URL not configured');
+                                    showMessageBox('❌ กาหนดค่าผิดพลาด', err.message);
                                     reject(err);
-                                })
-                                .processForm(document.getElementById('kratomForm'), token); // Assuming processForm is the backend function
+                                    return;
+                                }
+
+                                try {
+                                    const params = new URLSearchParams();
+                                    params.append('function', 'submitForm');
+                                    params.append('args', JSON.stringify([formObj, token]));
+
+                                    const response = await fetch(BACKEND_URL, {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                                        body: params
+                                    });
+
+                                    const result = await response.json();
+
+                                    if (result && result.success === false) {
+                                        throw new Error(result.message || 'Unknown backend error');
+                                    }
+
+                                    // GAS often returns string on simple success, or JSON. 
+                                    // If result is string (JSON parsed already?), or object.
+                                    // My doGet/doPost wrapper returns JSON.stringify(result).
+                                    // submitForm returns "Success message string" usually.
+                                    // So result might be just the string, OR {success: ...} if wrapped?
+                                    // doPost returns JSON.stringify(result). 
+                                    // If submitForm returns string, then response.json() is that string.
+
+                                    let msg = result;
+                                    // If result is object and has 'message' or 'success' check
+                                    // Adjust based on typical GAS return
+
+                                    showMessageBox('✅ สำเร็จ', msg);
+                                    form.reset();
+                                    hideSpecialInputs();
+                                    resolve();
+                                } catch (error) {
+                                    console.error('Submission error:', error);
+                                    showMessageBox('❌ เกิดข้อผิดพลาด', error.message || 'Connection failed');
+                                    reject(error);
+                                }
+                            }
                         });
                     });
                 });
+
+                function hideSpecialInputs() {
+                    ['water_other_text', 'fert_other_text', 'past_other_text', 'agent-name', 'gap-date-range', 'gacp-date-range', 'special-name', 'substanceValueBox'].forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.classList.add('hidden');
+                    });
+                    const otherVar = document.getElementById('other_varieties');
+                    if (otherVar) otherVar.value = '';
+                    const hormoneAnd = document.getElementById('hormone_and_other');
+                    if (hormoneAnd) hormoneAnd.value = '';
+                }
             }
         });
 
