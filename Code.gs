@@ -1311,10 +1311,31 @@ function getAllFarmersByLongPublic(longName) {
       const rowLongNorm = normalizeLongName(rowLong);
       
       // Match both original and normalized values
+      // Match both original and normalized values
       if (rowLong === longName || rowLongNorm === requestLongNorm) {
+        // SECURITY FIX: Filter only necessary fields for public usage
+        // Do NOT return all columns to prevent PII leakage
         const obj = {};
-        headers.forEach((h, idx) => obj[h] = row[idx]);
-        farmers.push(obj);
+        
+        // Helper to safely get value by potential header names
+        const getValue = (keys) => {
+            for (const key of keys) {
+                const idx = headers.indexOf(key);
+                if (idx !== -1) return row[idx];
+            }
+            return '';
+        };
+
+        // Extract ID
+        obj['a-id'] = getValue(['รหัสเกษตรกร', 'a-id', 'id', 'farmer_id']);
+        
+        // Extract Name
+        obj['a-fullname'] = getValue(['ชื่อ-นามสกุล', 'a-fullname', 'name', 'fullname', 'farmer_name']);
+        
+        // Only push if ID exists
+        if (obj['a-id']) {
+            farmers.push(obj);
+        }
       }
     }
     return { success: true, message: `พบ ${farmers.length} รายการ`, data: farmers };
