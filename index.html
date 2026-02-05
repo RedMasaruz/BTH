@@ -5942,8 +5942,12 @@
                     submitBtnEl.innerHTML = '<div class="loading-spinner"></div> กำลังส่ง...';
 
                     const token = sessionStorage.getItem('sessionToken');
-                    google.script.run.withSuccessHandler(msg => {
-                        showMessageBox('✅ สำเร็จ', msg);
+                    google.script.run.withSuccessHandler(result => {
+                        // result อาจเป็น Object {success, message} หรือ String โดยตรง
+                        const displayMessage = (typeof result === 'object' && result !== null)
+                            ? (result.message || 'บันทึกข้อมูลเรียบร้อยแล้ว')
+                            : (result || 'บันทึกข้อมูลเรียบร้อยแล้ว');
+                        showMessageBox('✅ สำเร็จ', displayMessage);
                         document.getElementById('kratomForm').reset();
 
                         // Hide "other" inputs, agent input and GAP/GACP ranges after reset
