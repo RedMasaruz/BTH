@@ -2217,6 +2217,34 @@
         const isGitHubPages = window.location.hostname.includes('github.io');
         const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbw9poCyJSr0l41Cczhj6wr42_QS7RUEn3sO-wE-K6v9WFE85E4FDynBvmJ_ZIH5z57A1A/exec';
 
+        /**
+         * Helper to call backend functions from both GAS and Web settings
+         */
+        function callBackendFunction(funcName, ...args) {
+            return new Promise((resolve, reject) => {
+                if (typeof google !== 'undefined' && google.script && google.script.run) {
+                    google.script.run
+                        .withSuccessHandler(resolve)
+                        .withFailureHandler(reject)
+                    [funcName](...args);
+                } else {
+                    if (!BACKEND_URL) return reject(new Error('BACKEND_URL not defined'));
+                    const params = new URLSearchParams();
+                    params.append('function', funcName);
+                    params.append('args', JSON.stringify(args));
+
+                    fetch(BACKEND_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: params
+                    })
+                        .then(r => r.json())
+                        .then(data => resolve(data)) // Resolve with exactly what the backend returned
+                        .catch(error => reject(error));
+                }
+            });
+        }
+
         // =============================================
         // UTILITIES: DEBOUNCE & THROTTLE
         // =============================================
